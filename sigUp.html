@@ -1,4 +1,4 @@
-<div id="Open">
+    <div id="Open">
         <p id="Sig">SinglUp</p>
         <form method="POST" action="../included/signUp.inc.php" id="SinglInForm">
             <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
@@ -13,8 +13,8 @@
             <input name="passwordTwo" type="text" class="Inp" id="passTwo" placeholder="RepeatPassword">
             <button type="submit">SinglUp</button>
         </form>
-        <a href="http://localhost/TODOPHP/pages/SinglIn.php" class="SinglIn">Вход</a>
-        <a href="http://localhost/TODOPHP/pages/ReceptionPassword.php" class="ReceptionPassword">Востановление пароля</a>
+        <a onclick="" href="#" class="SinglIn">SingIn</a>
+        <a onclick="" href="#" class="ReceptionPassword">Change Password</a>
     </div>
     <?php
         session_start();
