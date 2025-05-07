@@ -1,27 +1,14 @@
-<p>iewfhiofoieuf</p>
-<input>
-<input>
-<p>iewfhiofoieuf</p>
-<button onclick="mainTwo()">fewf</button>
-    <script>
-        function mainTwo() {
-        console.log('yes');
-        fetch('http://localhost/proxyTwo.php')
-            .then(response => {
-                if (!response.ok) {
-                throw new Error('Ошибка сети: ' + response.statusText);
-                }
-                return response.json(); // Получаем ответ в формате JSON
-            })
-            .then(data => {
-            // Декодируем содержимое файла из base64
-                const content = atob(data.content);
-                console.log(content); // Выводим содержимое файла в консоль
-                document.getElementById('base').innerHTML = content;
-            })
-            .catch(error => {
-                console.error('Ошибка:', error);
-            });
-    }
-    </script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SinglIn</title>
+    <link rel="stylesheet" href="../css/SinglIn.css">
+</head>
+<body id="base">
+    <button onclick="mainTwo()">fewf</button>
+</body>
+<script src="../included/SinglIn.js"></script>
+</html>
 
