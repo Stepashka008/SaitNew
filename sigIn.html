@@ -1,4 +1,4 @@
-<div id="Open">
+    <div id="Open">
         <p id="Sig">SinglIn</p>
         <form method="post" action="../index.php" id="SinglInForm">
             <div name="di" id="lox">
@@ -10,12 +10,11 @@
             <input name="age" id="pass" type="text" class="Inp" placeholder="Password">
             <button type="submit" id="submitBtn">SinglIn</button>
         </form>
-        <a href="http://localhost/TODOPHP/pages/SinglUp.php" class="SinglUp">Регистрация</a>
-        <a href="http://localhost/TODOPHP/pages/ReceptionPassword.php" class="ReceptionPassword">Востановление пароля</a>
+        <a onclick="mainTwo()" href="#" class="SinglUp">Registration</a>
+        <a onclick="mainTwo()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
     <?php require '../index.php'; 
         checkUserSession()
     ;?>  
     <script src="../included/function.js"></script>
     <script src="../included/SinglIn.js"></script>
-
