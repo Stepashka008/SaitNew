@@ -3,5 +3,25 @@
 <input>
 <p>iewfhiofoieuf</p>
 <button onclick="mainTwo()">fewf</button>
-<script src="../included/SinglIn.js"></script>
+    <script>
+        function mainTwo() {
+        console.log('yes');
+        fetch('http://localhost/proxyTwo.php')
+            .then(response => {
+                if (!response.ok) {
+                throw new Error('Ошибка сети: ' + response.statusText);
+                }
+                return response.json(); // Получаем ответ в формате JSON
+            })
+            .then(data => {
+            // Декодируем содержимое файла из base64
+                const content = atob(data.content);
+                console.log(content); // Выводим содержимое файла в консоль
+                document.getElementById('base').innerHTML = content;
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+    }
+    </script>
 
