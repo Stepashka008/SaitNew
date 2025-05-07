@@ -1,1 +1,24 @@
-<input>
+<div id="Open">
+        <p id="Sig">SinglUp</p>
+        <form method="POST" action="../included/signUp.inc.php" id="SinglInForm">
+            <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
+                <p id="lox"><?php echo $_GET['errors'] ?></p> <!-- Вывод, что нужно заполнить поля -->
+            <?php } ?>
+            <input name="namePerson" type="text" class="Inp" placeholder="Имя">
+            <input name="surname" type="text" class="Inp" placeholder="Фамилия">
+            <input name="age" type="text" class="Inp" placeholder="Возраст">
+            <input name="gender" type="text" class="Inp" placeholder="Пол">
+            <input name="email" type="text" class="Inp" placeholder="Email">
+            <input name="passwordOne" type="text" class="Inp" id="passOne" placeholder="Password">
+            <input name="passwordTwo" type="text" class="Inp" id="passTwo" placeholder="RepeatPassword">
+            <button type="submit">SinglUp</button>
+        </form>
+        <a href="http://localhost/TODOPHP/pages/SinglIn.php" class="SinglIn">Вход</a>
+        <a href="http://localhost/TODOPHP/pages/ReceptionPassword.php" class="ReceptionPassword">Востановление пароля</a>
+    </div>
+    <?php
+        session_start();
+        if (isset($_SESSION['user']) && !empty($_SESSION['user'])) {
+            header("Location: http://localhost/TODOPHP/pages/ToDo.php");
+        }
+    ?>
