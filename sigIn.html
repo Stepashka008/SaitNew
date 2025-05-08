@@ -12,7 +12,7 @@
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
 <script>
-// ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
+    // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
 function getDataBaseUser() {
     return fetch('http://localhost/conect.php')
         .then(response => {
@@ -177,16 +177,35 @@ async function checkOnUserSinglnIn(login, password) { // Такого польз
 }
 async function checkActivate(login) { // Неактивирован аккаунт
     const users = await getDataBaseUser(); // Получение базы данных пользователей
-    console.log(users);
     users.forEach(user => {
-        console.log(login);
-        console.log(user.email);
-        console.log(user.activ);
-        if (user.email == login && user.activ.toString() == '1') {
+        if (user.email == login && user.activ == 1) {
             return false; // Аккаунт активирован
         }
     });
     return true;
+}
+function checkSESSION() { // Находится ли пользователь в сессии
+    const ses = JSON.parse(localStorage.getItem('mySESSION'));
+    if (ses.check) {
+        ToDo(); // Переход на страницу с задачами
+    }
+}
+
+// ЗАПИСЬ В СЕССИЮ
+async function putSESSION(login, password) { // Запись
+    let ses = { id: 0, login: '', check: false};
+
+    const hashPassword = hashing(password.toString()); // Хэшируем пароль
+    const users = await getDataBaseUser(); // Получение базы данных пользователей
+    users.forEach(user => {
+        if (user.email == login && user.password == hashPassword) {
+            ses.id = user.id;
+            ses.login = user.email;
+            ses.check = true;
+        }
+    });
+
+    localStorage.setItem('mySESSION', JSON.stringify(data)); // Добавляем что пользователь в сессии
 }
 
 function checkingAndVxod() { // Выполнение проверок и вход после них
@@ -203,13 +222,14 @@ function checkingAndVxod() { // Выполнение проверок и вхо�
     else if (isEmptyPassword(password)) {
         loshara.innerHTML = `<p style="color: red;">Write Password</p>`;
     }
-    /*else if (checkOnUserSinglnIn(login, password)) {
+    else if (checkOnUserSinglnIn(login, password)) {
         loshara.innerHTML = `<p style="color: red;">User no Data Base</p>`;
-    }*/
+    }
     else if (checkActivate(login)) {
         loshara.innerHTML = `<p style="color: red;">Account not activ</p>`;
     }
     else {
+        putSESSION(login, password); // Запись в сессию
         ToDo(); // Переход на страницу с задачами
     }
 }
