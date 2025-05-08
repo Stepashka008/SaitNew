@@ -12,7 +12,6 @@
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
 <script>
-const bcrypt = require('bcrypt');
 // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
 function getDataBaseUser() {
     return fetch('http://localhost/conect.php')
@@ -130,6 +129,7 @@ function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
 async function checkOnUserSinglnIn(login, password) { // Такого пользователя нет в базе данных
+    const bcrypt = require('bcrypt');
     const users = await getDataBaseUser(); // Получаем пользователей
     const user = users.find(user => user.email === login);
     if (!user) {
