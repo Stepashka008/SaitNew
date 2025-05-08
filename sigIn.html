@@ -19,14 +19,14 @@
 <script>
     async function Vxod() { // Загрузка страницы входа
     try {
-      // 1. Загружаем HTML
+    // 1. Загружаем HTML
         const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
         const data = await response.json();
         const htmlContent = atob(data.content);
-      // 2. Создаём временный контейнер
+    // 2. Создаём временный контейнер
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
-      // 3. Переносим скрипты
+    // 3. Переносим скрипты
         const scripts = tempDiv.querySelectorAll('script');
         scripts.forEach(script => {
             const newScript = document.createElement('script');
@@ -37,7 +37,7 @@
             }
             document.body.appendChild(newScript);
         });
-      // 4. Вставляем остальное содержимое
+    // 4. Вставляем остальное содержимое
         document.body.innerHTML = '';
         document.body.append(...tempDiv.childNodes);
     } catch (error) {
@@ -46,14 +46,14 @@
 }
 async function Registration() { // Загрузка страницы регистрации
     try {
-      // 1. Загружаем HTML
+    // 1. Загружаем HTML
         const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
         const data = await response.json();
         const htmlContent = atob(data.content);
-      // 2. Создаём временный контейнер
+    // 2. Создаём временный контейнер
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
-      // 3. Переносим скрипты
+    // 3. Переносим скрипты
         const scripts = tempDiv.querySelectorAll('script');
         scripts.forEach(script => {
             const newScript = document.createElement('script');
@@ -64,7 +64,7 @@ async function Registration() { // Загрузка страницы регис�
             }
             document.body.appendChild(newScript);
         });
-      // 4. Вставляем остальное содержимое
+    // 4. Вставляем остальное содержимое
         document.body.innerHTML = '';
         document.body.append(...tempDiv.childNodes);
     } catch (error) {
@@ -73,14 +73,14 @@ async function Registration() { // Загрузка страницы регис�
 }
 async function ChangePassword() { // Загрузка страницы регистрации
     try {
-      // 1. Загружаем HTML
+    // 1. Загружаем HTML
         const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
         const data = await response.json();
         const htmlContent = atob(data.content);
-      // 2. Создаём временный контейнер
+    // 2. Создаём временный контейнер
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
-      // 3. Переносим скрипты
+    // 3. Переносим скрипты
         const scripts = tempDiv.querySelectorAll('script');
         scripts.forEach(script => {
             const newScript = document.createElement('script');
@@ -91,11 +91,53 @@ async function ChangePassword() { // Загрузка страницы реги�
             }
             document.body.appendChild(newScript);
         });
-      // 4. Вставляем остальное содержимое
+    // 4. Вставляем остальное содержимое
         document.body.innerHTML = '';
         document.body.append(...tempDiv.childNodes);
     } catch (error) {
         console.error('Ошибка загрузки:', error);
     }
+}
+
+// ПРОВЕРКИ
+function isEmptySignIn(login, password) { // Нету пароля и логина
+    return !login && !password;
+}
+function isEmptyLogin(login) { // Нету логина
+    return !login;
+}
+function isEmptyPassword(password) { // Нету пароля
+    return !password;
+}
+function checkOnUserSinglnIn(login, password) { // Нету в базе данных
+    fetch('http://localhost/conect.php')
+    .then(response => response.json())
+    .then(data => {
+    console.log("Данные из БД:", data);
+        // Вывод в HTML
+        console.log(JSON.stringify(data, null, 2));
+    })
+    .catch(error => console.error("Ошибка:", error));
+}
+function checkActivate(login) { // Неактивирован аккаунт
+    
+}
+
+function checkingAndVxod() { // Выполнение проверок и вход после них
+    const login = document.getElementById('login').value;
+    const password = document.getElementById('pass').value;
+    const loshara = document.getElementById('lox');
+
+    if (isEmptySignIn(login, password)) {
+        loshara.innerHTML = `<p style="color: red;">Введите логин и пароль</p>`;
+    }
+    else if (isEmptyLogin(login)) {
+        loshara.innerHTML = `<p style="color: red;">Введите логин</p>`;
+    }
+    else if (isEmptyPassword(password)) {
+        loshara.innerHTML = `<p style="color: red;">Введите пароль</p>`;
+    }
+
+    checkOnUserSinglnIn(login, password);
 }
 </script>
