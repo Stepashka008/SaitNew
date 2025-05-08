@@ -129,12 +129,8 @@ function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
 async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
-    try {
-        const users = await getDataBaseUser();
-        console.log("Users:", users);
-    } catch (error) {
-        console.error("Ошибка при получении пользователей:", error);
-    }
+    const users = await getDataBaseUser(); // Получение базы данных пользователей
+    console.log(users[0]);
 }
 function checkActivate(login) { // Неактивирован аккаунт
     
