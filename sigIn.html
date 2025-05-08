@@ -1,14 +1,12 @@
     <div id="Open">
         <p id="Sig">SinglIn</p>
-        <form method="post" action="../index.php" id="SinglInForm">
+        <form id="SinglInForm">
             <div name="di" id="lox">
-                <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
-                    <p id="proverka"><?php echo $_GET['errors'] ?></p> <!-- Вывод, что нужно заполнить поля -->
-                <?php } ?>
+                
             </div>
             <input name="name" id="login" type="text" class="Inp" placeholder="Email">
             <input name="age" id="pass" type="text" class="Inp" placeholder="Password">
-            <button type="submit" id="submitBtn" onclick="checkingAndVxod()">SinglIn</button>
+            <button id="submitBtn" onclick="checkingAndVxod()">SinglIn</button>
         </form>
         <a onclick="Registration()" href="#" class="SinglUp">Registration</a>
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
