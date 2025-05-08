@@ -12,89 +12,7 @@
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
 <script>
-    async function Vxod() { // Загрузка страницы входа
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
-}
-async function Registration() { // Загрузка страницы регистрации
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
-}
-async function ChangePassword() { // Загрузка страницы регистрации
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
-}
-
-// ПРОВЕРКИ
+    // ПРОВЕРКИ
 function isEmptySignIn(login, password) { // Нету пароля и логина
     return !login && !password;
 }
@@ -104,15 +22,24 @@ function isEmptyLogin(login) { // Нету логина
 function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
-function checkOnUserSinglnIn(login, password) { // Нету в базе данных
+function checkOnUserSinglnIn(login, password) {
     fetch('http://localhost/conect.php')
-    .then(response => response.json())
-    .then(data => {
-    console.log("Данные из БД:", data);
-        // Вывод в HTML
-        console.log(JSON.stringify(data, null, 2));
-    })
-    .catch(error => console.error("Ошибка:", error));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка сети: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Преобразуем данные в массив
+                const dataArray = Array.isArray(data.data) ? data.data : [data.data];
+                console.log("Massiv:", dataArray);
+            } else {
+                console.error("Ошибка в PHP:", data.error);
+            }
+        })
+        .catch(error => console.error("Ошибка:", error));
 }
 function checkActivate(login) { // Неактивирован аккаунт
     
