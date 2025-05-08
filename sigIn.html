@@ -132,7 +132,8 @@ async function checkOnUserSinglnIn(login, password) { // Такого польз
     let check = true;
     const users = await getDataBaseUser(); // Получение базы данных пользователей
     users.forEach(user => {
-        if (user.email == login && user.password == password) {
+        console.log(user.password, bcrypt.hashSync(password, salt));
+        if (user.email == login && user.password == bcrypt.hashSync(password, salt)) {
             check = false; // Есть в базе данных
         }
     });
