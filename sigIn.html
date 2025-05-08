@@ -129,7 +129,7 @@ function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
 async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
-    const yourPassword = console.log(bcrypt.hashSync(password, salt));
+    const yourPassword = bcrypt.hashSync(password, salt);
     console.log(yourPassword);
     let check = true;
     const users = await getDataBaseUser(); // Получение базы данных пользователей
