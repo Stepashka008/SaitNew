@@ -140,9 +140,7 @@ function isEmptyPassword(password) { // Нету пароля
 }
 async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
     // ДОБАВИТЬ ХЭШИРОВАНИЕ ПАРОЛЯ ----
-    const password = 'user_password'; // Пароль, который нужно захешировать
-    const salt = 'random_salt'; // Соль для хэширования
-    const hash = sha256(password + salt); // Хэшируем пароль с солью
+    const hash = sha256('user_password' + 'random_salt'); // Хэшируем пароль с солью
     console.log('Хэшированный пароль:', hash); // Выводим хэш в консоль
 
     const users = await getDataBaseUser(); // Получение базы данных пользователей
