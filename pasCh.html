@@ -22,4 +22,86 @@
             header("Location: http://localhost/TODOPHP/pages/ToDo.php");
         }
     ?>
-<script src="../included/Base.js"></script>
+<script>
+    async function Vxod() { // Загрузка страницы входа
+    try {
+      // 1. Загружаем HTML
+        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
+        const data = await response.json();
+        const htmlContent = atob(data.content);
+      // 2. Создаём временный контейнер
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+      // 3. Переносим скрипты
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            if(script.src) {
+                newScript.src = script.src;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+        });
+      // 4. Вставляем остальное содержимое
+        document.body.innerHTML = '';
+        document.body.append(...tempDiv.childNodes);
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+    }
+}
+async function Registration() { // Загрузка страницы регистрации
+    try {
+      // 1. Загружаем HTML
+        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
+        const data = await response.json();
+        const htmlContent = atob(data.content);
+      // 2. Создаём временный контейнер
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+      // 3. Переносим скрипты
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            if(script.src) {
+                newScript.src = script.src;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+        });
+      // 4. Вставляем остальное содержимое
+        document.body.innerHTML = '';
+        document.body.append(...tempDiv.childNodes);
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+    }
+}
+async function ChangePassword() { // Загрузка страницы регистрации
+    try {
+      // 1. Загружаем HTML
+        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
+        const data = await response.json();
+        const htmlContent = atob(data.content);
+      // 2. Создаём временный контейнер
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+      // 3. Переносим скрипты
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            if(script.src) {
+                newScript.src = script.src;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+        });
+      // 4. Вставляем остальное содержимое
+        document.body.innerHTML = '';
+        document.body.append(...tempDiv.childNodes);
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+    }
+}
+</script>
