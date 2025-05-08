@@ -12,7 +12,28 @@
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
 <script>
-    // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
+ // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
+function getDataBaseUsers() { // Получение всей базы данных - пользователей
+    fetch('http://localhost/conect.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка сети: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Преобразуем данные в массив
+                const dataArray = Array.isArray(data.data) ? data.data : [data.data];
+                console.log(dataArray);
+                return dataArray;
+            } else {
+                console.error("Ошибка в PHP:", data.error);
+            }
+        })
+        .catch(error => console.error("Ошибка:", error));
+}
+// ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
 async function Vxod() { // Загрузка страницы входа
     try {
     // 1. Загружаем HTML
@@ -106,7 +127,7 @@ function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
 function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
-    const dataArray = getDataBase(); // Получение базы данных
+    const dataArray = getDataBaseUsers(); // Получение базы данных
     console.log(dataArray);
 }
 function checkActivate(login) { // Неактивирован аккаунт
@@ -129,26 +150,5 @@ function checkingAndVxod() { // Выполнение проверок и вхо�
     }
 
     checkOnUserSinglnIn(login, password);
-}
-
-// ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
-function getDataBase() { // Получение всей базы данных - пользователей
-    fetch('http://localhost/conect.php')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка сети: ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Преобразуем данные в массив
-                const dataArray = Array.isArray(data.data) ? data.data : [data.data];
-                return dataArray;
-            } else {
-                console.error("Ошибка в PHP:", data.error);
-            }
-        })
-        .catch(error => console.error("Ошибка:", error));
 }
 </script>
