@@ -129,12 +129,14 @@ function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
 async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
+    let check = true;
     const users = await getDataBaseUser(); // Получение базы данных пользователей
     users.forEach(user => {
-        console.log(user.id);
+        if (user.email == login && user.password == password) {
+            check = false; // Есть в базе данных
+        }
     });
-    // console.log(users[0].id);
-    // if ()
+    return check;
 }
 function checkActivate(login) { // Неактивирован аккаунт
     
@@ -157,5 +159,6 @@ function checkingAndVxod() { // Выполнение проверок и вхо�
     else if (checkOnUserSinglnIn(login, password)) {
         loshara.innerHTML = `<p style="color: red;">Users not Data Base</p>`;
     }
+    console.log('YES');
 }
 </script>
