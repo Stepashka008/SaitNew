@@ -12,6 +12,7 @@
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
 <script>
+const bcrypt = require('bcrypt');
 // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
 function getDataBaseUser() {
     return fetch('http://localhost/conect.php')
@@ -128,17 +129,17 @@ function isEmptyLogin(login) { // Нету логина
 function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
-async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
-    const yourPassword = bcrypt.hashSync(password, salt);
-    console.log(yourPassword);
-    let check = true;
-    const users = await getDataBaseUser(); // Получение базы данных пользователей
-    users.forEach(user => {
-        if (user.email == login && user.password == yourPassword) {
-            check = false; // Есть в базе данных
-        }
-    });
-    return check;
+async function checkOnUserSinglnIn(login, password) { // Такого пользователя нет в базе данных
+    const users = await getDataBaseUser(); // Получаем пользователей
+    const user = users.find(user => user.email === login);
+    if (!user) {
+        return true;
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        return true;
+    }
+    return false; // Пользователь существует и пароль верный
 }
 function checkActivate(login) { // Неактивирован аккаунт
     
