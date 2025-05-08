@@ -130,7 +130,7 @@ function isEmptyPassword(password) { // Нету пароля
 }
 async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
     const users = await getDataBaseUser(); // Получение базы данных пользователей
-    console.log(users[0]);
+    console.log(users[0].id);
 }
 function checkActivate(login) { // Неактивирован аккаунт
     
