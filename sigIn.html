@@ -178,6 +178,8 @@ async function checkOnUserSinglnIn(login, password) { // Такого польз
 async function checkActivate(login) { // Неактивирован аккаунт
     const users = await getDataBaseUser(); // Получение базы данных пользователей
     users.forEach(user => {
+        console.log(login);
+        console.log(user.activ);
         if (user.email == login && user.activ == 1) {
             return false; // Аккаунт активирован
         }
