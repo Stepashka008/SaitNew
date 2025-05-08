@@ -179,6 +179,7 @@ async function checkActivate(login) { // Неактивирован аккаун
     const users = await getDataBaseUser(); // Получение базы данных пользователей
     users.forEach(user => {
         console.log(login);
+        console.log(user.email);
         console.log(user.activ);
         if (user.email == login && user.activ == 1) {
             return false; // Аккаунт активирован
