@@ -181,7 +181,7 @@ async function checkActivate(login) { // Неактивирован аккаун
         console.log(login);
         console.log(user.email);
         console.log(user.activ);
-        if (user.email == login && user.activ == 1) {
+        if (user.email == login && user.activ.toString() == '1') {
             return false; // Аккаунт активирован
         }
     });
