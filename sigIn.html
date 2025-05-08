@@ -37,13 +37,12 @@ function getDataBaseUser() {
 }
 
 // ХЭШИРОВАНИЕ ПАРОЛЯ
-async function hashPassword(password) { // Хэширование
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.dify('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+function sha256(input) {
+    const hash = new Uint8Array(32); // Создаем массив для хранения хэша
+    for (let i = 0; i < input.length; i++) {
+        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256; // Хэшируем каждый символ
+    }
+    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join(''); // Преобразуем массив байт в шестнадцатеричную строку
 }
 
 // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
@@ -141,8 +140,11 @@ function isEmptyPassword(password) { // Нету пароля
 }
 async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
     // ДОБАВИТЬ ХЭШИРОВАНИЕ ПАРОЛЯ ----
-    const yourPass = await hashPassword('jwefkbwq0');
-    console.log(yourPass);
+    const password = 'user_password'; // Пароль, который нужно захешировать
+    const salt = 'random_salt'; // Соль для хэширования
+    const hash = sha256(password + salt); // Хэшируем пароль с солью
+    console.log('Хэшированный пароль:', hash); // Выводим хэш в консоль
+
     const users = await getDataBaseUser(); // Получение базы данных пользователей
     users.forEach(user => {
         if (user.email == login && user.password == password) {
