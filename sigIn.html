@@ -12,27 +12,28 @@
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
 <script>
-let dataArrayUsers;
-
 // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
-function getDataBaseUsers() { // Получение всей базы данных - пользователей
-    fetch('http://localhost/conect.php')
+function getDataBaseUser() {
+    return fetch('http://localhost/conect.php')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Ошибка сети: ' + response.statusText);
+                throw new new Error('Ошибка сети: ' + response.statusText);
             }
             return response.json();
         })
         .then(data => {
             if (data.success) {
                 // Преобразуем данные в массив
-                dataArrayUsers = Array.isArray(data.data) ? data.data : [data.data];
-                console.log(dataArrayUsers);
+                const dataArrayUser = Array.isArray(data.data) ? data.data : [data.data];
+                return dataArrayUser; // Возвращаем массив
             } else {
-                console.error("Ошибка в PHP:", data.error);
+                throw new Error("Ошибка в PHP: " + data.error);
             }
         })
-        .catch(error => console.error("Ошибка:", error));
+        .catch(error => {
+            console.error("Ошибка:", error);
+            throw error; // Пробрасываем ошибку, чтобы её можно было обработать
+        });
 }
 // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
 async function Vxod() { // Загрузка страницы входа
@@ -127,10 +128,13 @@ function isEmptyLogin(login) { // Нету логина
 function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
-function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
-    getDataBaseUsers().then(users => {
-        console.log(users); // Данные доступны здесь
-    });
+async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
+    try {
+        const users = await getDataBaseUser();
+        console.log("Users:", users);
+    } catch (error) {
+        console.error("Ошибка при получении пользователей:", error);
+    }
 }
 function checkActivate(login) { // Неактивирован аккаунт
     
