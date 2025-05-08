@@ -128,8 +128,9 @@ function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
 function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
-    getDataBaseUsers(); // Получение базы данных
-    console.log(dataArrayUsers);
+    getDataBaseUsers().then(users => {
+        console.log(users); // Данные доступны здесь
+    });
 }
 function checkActivate(login) { // Неактивирован аккаунт
     
