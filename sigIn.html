@@ -107,9 +107,7 @@ function isEmptyPassword(password) { // Нету пароля
 }
 function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
     const dataArray = getDataBase(); // Получение базы данных
-    dataArray.forEach(item => {
-        console.log(item);
-    });
+    console.log(dataArray);
 }
 function checkActivate(login) { // Неактивирован аккаунт
     
