@@ -14,6 +14,8 @@
             <input name="passwordTwo" type="password" class="Inp" id="pasTwo" placeholder="Password">
             <button type="submit">Сhange</button>
     </div>
+        <a onclick="Vxod()" href="#" class="SinglUp">SignlIn</a>
+        <a onclick="Registration()" href="#" class="ReceptionPassword">SignlUp</a>
     <?php
         session_start();
         if (isset($_SESSION['user']) && !empty($_SESSION['user'])) {
