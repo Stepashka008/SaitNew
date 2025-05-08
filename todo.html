@@ -1,0 +1,42 @@
+<div id="main">
+            <?php 
+                session_start();
+
+                if (!$_SESSION['user']['logged_in']) {
+                    header('location: ../pages/SinglIn.php');
+                    exit();
+                }
+
+                ?> <!-- Проверка на лоха -->
+                <div id="twoMain">
+                    <p class="lox">ToDo</p>
+                    <p class="loxTwo"><?php echo "Добро пожаловать, " . htmlspecialchars($_SESSION['user']['login']); ?></p>
+                </div>
+
+                <a id="exit" href="http://localhost/TODOPHP/included/ToDo.inc.php?errors=logout">logout</a>
+    </div>
+    <form method="POST" action="../included/ToDo.inc.php" id="ToDoForm">
+
+            <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
+                <p id="proverka"><?php echo $_GET['errors'] ?></p> <!-- Вывод, что нужно заполнить поля -->
+            <?php } ?>
+
+            <div id="Comment">
+                <input name="nameCom" type="text" class="Inp" placeholder="Название">
+                <input name="Comment" type="text" class="Inp" placeholder="Комментарий">
+            </div>
+            <button type="submit">Create</button>
+    </form>
+
+    <?php if (!empty($_SESSION['form_html'])) { ?> <!-- Добавление -->
+        <p id="proverka"><?php echo $_SESSION['form_html']; unset($_SESSION['form_html']); ?></p>
+    <?php } ?>
+
+    <?php 
+        if (!$_SESSION['user']['visited']) {
+                    header("Location: ../included/ToDo.inc.php?errors=0"); // 0 - Загрузка коментариев
+                    $_SESSION['user']['visited'] = true;
+                    exit();
+            } 
+        $_SESSION['user']['visited'] = false; // Для обновления страницы
+    ?>
