@@ -27,6 +27,7 @@ function getDataBaseUsers() { // Получение всей базы данны
             if (data.success) {
                 // Преобразуем данные в массив
                 dataArrayUsers = Array.isArray(data.data) ? data.data : [data.data];
+                console.log(dataArrayUsers);
             } else {
                 console.error("Ошибка в PHP:", data.error);
             }
