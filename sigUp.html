@@ -188,15 +188,15 @@ function checkEmail(email) { // Email введен верно
 }
 async function checkUserYetInDataBase(yourEmail) { // Такой пользователь уже есть в БД
     const users = await getDataBaseUser();
+
     console.log(users);
-    let chcek = true;
 
     for (const user of users) {
         if (user.email == yourEmail) {
-            chcek = false;
+            chcek = true;
         }
     }
-    return chcek;
+    return false;
 }
 function checkSESSION() { // Находится ли пользователь в сессии
     const ses = JSON.parse(localStorage.getItem('mySESSION'));
@@ -270,9 +270,9 @@ function checkingAndRegistration() {
         else if (checkAge(age)) {
             loshara.innerHTML = `<p style="color: red;">Age not right</p>`;
         }
-        else if (checkUserYetInDataBase(email)) {
+        /*else if (checkUserYetInDataBase(email)) {
             loshara.innerHTML = `<p style="color: red;">User yet in Data Base</p>`;
-        }
+        }*/
         else {
             saveInDataBase(fulname, surname, gender, email, pasOne, age); // Сохранение в БД
             Vxod(); // Переход на страницу с задачами
