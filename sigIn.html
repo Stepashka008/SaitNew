@@ -12,29 +12,90 @@
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
 <script>
-   // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
-function getDataBaseUser() {
-    return fetch('http://localhost/conect.php')
-        .then(response => {
-            if (!response.ok) {
-                throw new new Error('Ошибка сети: ' + response.statusText);
+  // Глобальная переменная для БД
+let userDatabaseCache = null;
+let lastFetchTime = 0;
+const CACHE_LIFETIME = 5 * 60 * 1000; // 5 минут в миллисекундах
+
+// ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
+async function getDataBaseUser(forceRefresh = false) {
+    // Если есть кэш и он еще актуален, и не требуется принудительное обновление
+    if (userDatabaseCache && Date.now() - lastFetchTime < CACHE_LIFETIME && !forceRefresh) {
+        console.log('Returning cached user database');
+        return userDatabaseCache;
+    }
+
+    try {
+        console.log('Fetching fresh user database...');
+        const response = await fetch('http://localhost/conect.php');
+        
+        if (!response.ok) {
+            throw new Error(`Network error: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(`Server error: ${data.error || 'Unknown error'}`);
+        }
+        
+        // Нормализация и кэширование данных
+        userDatabaseCache = Array.isArray(data.data) ? data.data : [data.data];
+        lastFetchTime = Date.now();
+        
+        // Сохраняем в localStorage для persistence между перезагрузками страницы
+        try {
+            localStorage.setItem('userDatabaseCache', JSON.stringify({
+                data: userDatabaseCache,
+                timestamp: lastFetchTime
+            }));
+        } catch (e) {
+            console.warn('Failed to save to localStorage:', e);
+        }
+        
+        return userDatabaseCache;
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+        
+        // В случае ошибки пробуем вернуть данные из localStorage
+        try {
+            const cached = JSON.parse(localStorage.getItem('userDatabaseCache'));
+            if (cached && cached.data) {
+                console.warn('Using stale data from localStorage due to fetch error');
+                return cached.data;
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Преобразуем данные в массив
-                const dataArrayUser = Array.isArray(data.data) ? data.data : [data.data];
-                return dataArrayUser; // Возвращаем массив
-            } else {
-                throw new Error("Ошибка в PHP: " + data.error);
-            }
-        })
-        .catch(error => {
-            console.error("Ошибка:", error);
-            throw error; // Пробрасываем ошибку, чтобы её можно было обработать
-        });
+        } catch (e) {
+            console.warn('Failed to parse cached data:', e);
+        }
+        
+        throw error;
+    }
 }
+(async function initUserDatabase() {
+    try {
+        // Пробуем загрузить из localStorage
+        const cached = JSON.parse(localStorage.getItem('userDatabaseCache'));
+        if (cached && cached.data && cached.timestamp) {
+            userDatabaseCache = cached.data;
+            lastFetchTime = cached.timestamp;
+            
+            // Проверяем актуальность данных
+            if (Date.now() - lastFetchTime < CACHE_LIFETIME) {
+                console.log('Initialized user database from cache');
+            } else {
+                // Фоновая загрузка свежих данных
+                getDataBaseUser(true).catch(e => 
+                    console.warn('Background refresh failed:', e)
+                );
+            }
+        } else {
+            // Первоначальная загрузка
+            await getDataBaseUser();
+        }
+    } catch (e) {
+        console.error('Initialization error:', e);
+    }
+})();
 
 // ХЭШИРОВАНИЕ ПАРОЛЯ
 function hashing(input) { // Хэширование
@@ -165,9 +226,9 @@ function isEmptyLogin(login) { // Нету логина
 function isEmptyPassword(password) { // Нету пароля
     return !password;
 }
-async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
+function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
     const hashPassword = hashing(password.toString()); // Хэшируем пароль
-    const users = await getDataBaseUser(); // Получение базы данных пользователей
+    const users = userDatabaseCache ; // Получение базы данных пользователей
     users.forEach(user => {
         if (user.email == login && user.password == hashPassword) {
             return false; // Есть в базе данных
@@ -175,8 +236,8 @@ async function checkOnUserSinglnIn(login, password) { // Такого польз
     });
     return true;
 }
-async function checkActivate(login) { // Неактивирован аккаунт
-    const users = await getDataBaseUser(); // Получение базы данных пользователей
+function checkActivate(login) { // Неактивирован аккаунт
+    const users = userDatabaseCache ; // Получение базы данных пользователей
     users.forEach(user => {
         if (user.email == login && user.activ == 1) {
             return false; // Аккаунт активирован
@@ -223,15 +284,16 @@ function checkingAndVxod() { // Выполнение проверок и вхо�
         loshara.innerHTML = `<p style="color: red;">Write Password</p>`;
     }
     // Две проверки не работают
-    /*else if (checkOnUserSinglnIn(login, password)) {
+    else if (checkOnUserSinglnIn(login, password)) {
         loshara.innerHTML = `<p style="color: red;">User no Data Base</p>`;
     }
     else if (checkActivate(login)) {
         loshara.innerHTML = `<p style="color: red;">Account not activ</p>`;
-    }*/
+    }
     else {
         putSESSION(login, password); // Запись в сессию
         ToDo(); // Переход на страницу с задачами
     }
 }
+
 </script>
