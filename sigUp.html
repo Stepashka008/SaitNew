@@ -191,6 +191,7 @@ async function checkUserYetInDataBase(yourEmail) { // Такой пользов�
     const users = await getDataBaseUser(); // Получение базы данных пользователей
     users.forEach(user => {
         if (user.email == yourEmail) {
+            console.log(user.email);
             return true; // Пользователь уже есть в БД
         }
     });
