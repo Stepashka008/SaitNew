@@ -1,9 +1,9 @@
 <div id="Open">
         <p id="Sig">ReceptionPassword</p>
         <form id="SinglInForm">
-            <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
-                <p id="lox"><?php echo $_GET['errors'] ?></p> <!-- Вывод, что нужно заполнить поля -->
-            <?php } ?>
+            <div name="di" id="lox">
+                
+            </div>
             <input name="email" id="email" type="text" class="Inp" placeholder="Login/Email">
             <button type="button">Send</button>
         </form>
