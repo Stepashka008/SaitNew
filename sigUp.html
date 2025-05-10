@@ -224,7 +224,7 @@ async function saveInDataBase(fulname, surnames, gen, em, pasOne, ag) {
     };
 
     try {
-        const response = await fetch('process.php', {
+        const response = await fetch('http://localhost/process.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/json',},
             body: JSON.stringify(data)
