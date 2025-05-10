@@ -24,27 +24,26 @@
     ?>
 <script>
 // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
-function getDataBaseUser() {
-    return fetch('http://localhost/conect.php')
-        .then(response => {
-            if (!response.ok) {
-                throw new new Error('Ошибка сети: ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Преобразуем данные в массив
-                const dataArrayUser = Array.isArray(data.data) ? data.data : [data.data];
-                return dataArrayUser; // Возвращаем массив
-            } else {
-                throw new Error("Ошибка в PHP: " + data.error);
-            }
-        })
-        .catch(error => {
-            console.error("Ошибка:", error);
-            throw error; // Пробрасываем ошибку, чтобы её можно было обработать
-        });
+async function getDataBaseUser() {
+    try {
+        const response = await fetch('http://localhost/conect.php');
+        
+        if (!response.ok) {
+            throw new Error(`Network error: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(`Server error: ${data.error || 'Unknown error'}`);
+        }
+        
+        // Нормализация данных - всегда возвращаем массив
+        return Array.isArray(data.data) ? data.data : [data.data];
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+        throw error; // Позволяет обработать ошибку на уровне вызова
+    }
 }
 
 // ХЭШИРОВАНИЕ ПАРОЛЯ
