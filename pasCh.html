@@ -23,30 +23,37 @@
         }
     ?>
 <script>
-  let email = '';
-const losharaOne = document.getElementById('lox');
-const losharaTwo = document.getElementById('loxTwo');
-// ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
-async function getDataBaseUser() {
-    try {
-        const response = await fetch('http://localhost/conect.php');
-        
-        if (!response.ok) {
-            throw new Error(`Network error: ${response.status} ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        
-        if (!data.success) {
-            throw new Error(`Server error: ${data.error || 'Unknown error'}`);
-        }
-        
-        // Нормализация данных - всегда возвращаем массив
-        return Array.isArray(data.data) ? data.data : [data.data];
-    } catch (error) {
-        console.error('Failed to fetch users:', error);
-        throw error; // Позволяет обработать ошибку на уровне вызова
+ // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
+function getDataBaseUser() {
+    return fetch('http://localhost/conect.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new new Error('Ошибка сети: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Преобразуем данные в массив
+                const dataArrayUser = Array.isArray(data.data) ? data.data : [data.data];
+                return dataArrayUser; // Возвращаем массив
+            } else {
+                throw new Error("Ошибка в PHP: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Ошибка:", error);
+            throw error; // Пробрасываем ошибку, чтобы её можно было обработать
+        });
+}
+
+// ХЭШИРОВАНИЕ ПАРОЛЯ
+function hashing(input) { // Хэширование
+    const hash = new Uint8Array(32); // Создаем массив для хранения хэша
+    for (let i = 0; i < input.length; i++) {
+        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256; // Хэшируем каждый символ
     }
+    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join(''); // Преобразуем массив байт в шестнадцатеричную строку
 }
 
 // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
@@ -160,66 +167,83 @@ async function ToDo() { // Загрузка страницы с задачами
 }
 
 // ПРОВЕРКИ
-async function checkEmailAndMessage(yourEmail) { // Проверяем и находим email
-    const users = await getDataBaseUser();
-
-    let em = '';
-    let code = 0;
-
-    for (const user of users) {
-        if (user.email == yourEmail) {
-            em = yourEmail;
-            code = user.code;
-            break;
+function isEmptySignIn(login, password) { // Нету пароля и логина
+    return !login && !password;
+}
+function isEmptyLogin(login) { // Нету логина
+    return !login;
+}
+function isEmptyPassword(password) { // Нету пароля
+    return !password;
+}
+async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
+    const hashPassword = hashing(password.toString()); // Хэшируем пароль
+    const users = await getDataBaseUser(); // Получение базы данных пользователей
+    users.forEach(user => {
+        if (user.email == login && user.password == hashPassword) {
+            return false; // Есть в базе данных
         }
-    }
-    return [em, code];
-}
-function isEmptySignUp(code, pasOne, pasTwo) { // Все поля заполнены
-    return !code || !pasOne || !pasTwo;
-}
-function checkPasswordsOnCoincidence(passwordOne, passwordTwo) { // Введенные пароли совпадают
-    return passwordOne != passwordTwo;
-}
-async function checkCode(yourCode) { // Проверка на совпадение кода
-    const users = await getDataBaseUser();
-
-    for (const user of users) {
-        if (user.email == email && user.code == yourCode) {
-            return false;
-        }
-    }
+    });
     return true;
 }
-
-async function setCode() { // Отправляем код
-    email = document.getElementById('email').value;
-    const emAndCode = checkEmailAndMessage(email);
-
-    if (emAndCode[0] == '') {
-        loshara.innerHTML = `<p style="color: red;">No email in DataBase</p>`;
-    }
-    else {
-        const response = await fetch("http://localhost/message.php?email=" . urlencode(email + code));
+async function checkActivate(login) { // Неактивирован аккаунт
+    const users = await getDataBaseUser(); // Получение базы данных пользователей
+    users.forEach(user => {
+        if (user.email == login && user.activ == 1) {
+            return false; // Аккаунт активирован
+        }
+    });
+    return true;
+}
+function checkSESSION() { // Находится ли пользователь в сессии
+    const ses = JSON.parse(localStorage.getItem('mySESSION'));
+    if (ses.check) {
+        ToDo(); // Переход на страницу с задачами
     }
 }
 
-function changePassword() { // Смена пароля после получения кода
-    code = document.getElementById('code').value;
-    passOne = document.getElementById('passwordOne').value;
-    passTwo = document.getElementById('passwordTwo').value;
+// ЗАПИСЬ В СЕССИЮ
+async function putSESSION(login, password) { // Запись
+    let ses = { id: 0, login: '', check: false};
 
-    if (isEmptySignUp(code, pasOne, pasTwo)) {
-        losharaTwo.innerHTML = `<p style="color: red;">Need write all input</p>`;
+    const hashPassword = hashing(password.toString()); // Хэшируем пароль
+    const users = await getDataBaseUser(); // Получение базы данных пользователей
+    users.forEach(user => {
+        if (user.email == login && user.password == hashPassword) {
+            ses.id = user.id;
+            ses.login = user.email;
+            ses.check = true;
+        }
+    });
+
+    localStorage.setItem('mySESSION', JSON.stringify(data)); // Добавляем что пользователь в сессии
+}
+
+function checkingAndVxod() { // Выполнение проверок и вход после них
+    const login = document.getElementById('login').value;
+    const password = document.getElementById('pass').value;
+    const loshara = document.getElementById('lox');
+
+    if (isEmptySignIn(login, password)) {
+        loshara.innerHTML = `<p style="color: red;">Write Login and Password</p>`;
     }
-    else if (checkPasswordsOnCoincidence(passOne, passTwo)) {
-        losharaTwo.innerHTML = `<p style="color: red;">Passwords not toghtether</p>`;
+    else if (isEmptyLogin(login)) {
+        loshara.innerHTML = `<p style="color: red;">Write Login</p>`;
     }
-    else if (checkCode(code)) {
-        losharaTwo.innerHTML = `<p style="color: red;">Code not this</p>`;
+    else if (isEmptyPassword(password)) {
+        loshara.innerHTML = `<p style="color: red;">Write Password</p>`;
     }
+    // Две проверки не работают
+    /*else if (checkOnUserSinglnIn(login, password)) {
+        loshara.innerHTML = `<p style="color: red;">User no Data Base</p>`;
+    }
+    else if (checkActivate(login)) {
+        loshara.innerHTML = `<p style="color: red;">Account not activ</p>`;
+    }*/
     else {
-
+        putSESSION(login, password); // Запись в сессию
+        ToDo(); // Переход на страницу с задачами
     }
 }
+
 </script>
