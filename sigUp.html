@@ -188,7 +188,7 @@ function checkEmail(email) { // Email введен верно
 }
 async function checkUserYetInDataBase(yourEmail) { // Такой пользователь уже есть в БД
     const users = await getDataBaseUser();
-    
+    console.log(users);
     let chcek = true;
 
     for (const user of users) {
