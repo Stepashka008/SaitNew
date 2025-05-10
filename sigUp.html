@@ -190,8 +190,8 @@ function checkEmail(email) { // Email введен верно
 async function checkUserYetInDataBase(yourEmail) { // Такой пользователь уже есть в БД
     const users = await getDataBaseUser(); // Получение базы данных пользователей
     users.forEach(user => {
+        console.log(user.email);
         if (user.email == yourEmail) {
-            console.log(user.email);
             return true; // Пользователь уже есть в БД
         }
     });
@@ -243,7 +243,6 @@ async function saveInDataBase(fulname, surnames, gen, em, pasOne, ag) {
     }
 }
 
-
 function checkingAndRegistration() {
     const fulname = document.getElementById('namePerson').value;
     const surname = document.getElementById('surname').value;
@@ -270,13 +269,14 @@ function checkingAndRegistration() {
         else if (checkAge(age)) {
             loshara.innerHTML = `<p style="color: red;">Age not right</p>`;
         }
-        /*else if (checkUserYetInDataBase(email)) {
+        else if (checkUserYetInDataBase(email)) {
             loshara.innerHTML = `<p style="color: red;">User yet in Data Base</p>`;
-        }*/
+        }
         else {
             saveInDataBase(fulname, surname, gender, email, pasOne, age); // Сохранение в БД
             Vxod(); // Переход на страницу с задачами
         }
     }
 }
+
 </script>
