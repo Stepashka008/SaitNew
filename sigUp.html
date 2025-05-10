@@ -1,17 +1,17 @@
     <div id="Open">
         <p id="Sig">SinglUp</p>
-        <form method="POST" action="../included/signUp.inc.php" id="SinglInForm">
+        <form id="SinglInForm">
             <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
                 <p id="lox"><?php echo $_GET['errors'] ?></p> <!-- Вывод, что нужно заполнить поля -->
             <?php } ?>
-            <input name="namePerson" type="text" class="Inp" placeholder="Name">
-            <input name="surname" type="text" class="Inp" placeholder="Surname">
-            <input name="age" type="text" class="Inp" placeholder="Age">
-            <input name="gender" type="text" class="Inp" placeholder="Gender">
-            <input name="email" type="text" class="Inp" placeholder="Email">
-            <input name="passwordOne" type="text" class="Inp" id="passOne" placeholder="Password">
-            <input name="passwordTwo" type="text" class="Inp" id="passTwo" placeholder="RepeatPassword">
-            <button type="submit">SinglUp</button>
+            <input name="namePerson" id="namePerson" type="text" class="Inp" placeholder="Name">
+            <input name="surname" id="surname" type="text" class="Inp" placeholder="Surname">
+            <input name="age" id="age" type="text" class="Inp" placeholder="Age">
+            <input name="gender" id="gender" type="text" class="Inp" placeholder="Gender">
+            <input name="email" id="email" type="text" class="Inp" placeholder="Email">
+            <input name="passwordOne" id="passwordOne" type="text" class="Inp" id="passOne" placeholder="Password">
+            <input name="passwordTwo" id="passwordTwo" type="text" class="Inp" id="passTwo" placeholder="RepeatPassword">
+            <button type="button" onclick="checkingAndRegistration()">SinglUp</button>
         </form>
         <a onclick="Vxod()" href="#" class="SinglIn">SingIn</a>
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
