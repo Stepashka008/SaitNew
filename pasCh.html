@@ -165,7 +165,7 @@ async function checkEmailAndMessage(yourEmail) { // Проверяем и нах
 
     for (const user of users) {
         if (user.email == yourEmail) {
-            return user.code;
+            return user.code.value;
         }
     }
     return 0;
