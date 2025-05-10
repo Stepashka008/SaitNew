@@ -189,15 +189,14 @@ function checkEmail(email) { // Email введен верно
 async function checkUserYetInDataBase(yourEmail) { // Такой пользователь уже есть в БД
     const users = await getDataBaseUser();
     
+    let chcek = false;
+
     for (const user of users) {
-        console.log(yourEmail);
-        console.log(user.email);
         if (user.email == yourEmail) {
-            console.log(user.email + " - " + yourEmail);
-            return true;
+            chcek = true;
         }
     }
-    return false;
+    return chcek;
 }
 function checkSESSION() { // Находится ли пользователь в сессии
     const ses = JSON.parse(localStorage.getItem('mySESSION'));
