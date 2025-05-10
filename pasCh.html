@@ -5,7 +5,7 @@
                 
             </div>
             <input name="email" id="email" type="text" class="Inp" placeholder="Login/Email">
-            <button type="button">Send</button>
+            <button type="button" oncick="setCode()">Send</button>
         </form>
         <form id="SinglInForm">
             <p id="loxTwo"></p><!-- Проверка на лоха-->
@@ -23,16 +23,43 @@
         }
     ?>
 <script>
-    async function Vxod() { // Загрузка страницы входа
+  let email = '';
+const losharaOne = document.getElementById('lox');
+const losharaTwo = document.getElementById('loxTwo');
+// ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
+async function getDataBaseUser() {
     try {
-      // 1. Загружаем HTML
+        const response = await fetch('http://localhost/conect.php');
+        
+        if (!response.ok) {
+            throw new Error(`Network error: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(`Server error: ${data.error || 'Unknown error'}`);
+        }
+        
+        // Нормализация данных - всегда возвращаем массив
+        return Array.isArray(data.data) ? data.data : [data.data];
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+        throw error; // Позволяет обработать ошибку на уровне вызова
+    }
+}
+
+// ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
+async function Vxod() { // Загрузка страницы входа
+    try {
+    // 1. Загружаем HTML
         const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
         const data = await response.json();
         const htmlContent = atob(data.content);
-      // 2. Создаём временный контейнер
+    // 2. Создаём временный контейнер
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
-      // 3. Переносим скрипты
+    // 3. Переносим скрипты
         const scripts = tempDiv.querySelectorAll('script');
         scripts.forEach(script => {
             const newScript = document.createElement('script');
@@ -43,7 +70,7 @@
             }
             document.body.appendChild(newScript);
         });
-      // 4. Вставляем остальное содержимое
+    // 4. Вставляем остальное содержимое
         document.body.innerHTML = '';
         document.body.append(...tempDiv.childNodes);
     } catch (error) {
@@ -52,14 +79,14 @@
 }
 async function Registration() { // Загрузка страницы регистрации
     try {
-      // 1. Загружаем HTML
+    // 1. Загружаем HTML
         const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
         const data = await response.json();
         const htmlContent = atob(data.content);
-      // 2. Создаём временный контейнер
+    // 2. Создаём временный контейнер
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
-      // 3. Переносим скрипты
+    // 3. Переносим скрипты
         const scripts = tempDiv.querySelectorAll('script');
         scripts.forEach(script => {
             const newScript = document.createElement('script');
@@ -70,7 +97,7 @@ async function Registration() { // Загрузка страницы регис�
             }
             document.body.appendChild(newScript);
         });
-      // 4. Вставляем остальное содержимое
+    // 4. Вставляем остальное содержимое
         document.body.innerHTML = '';
         document.body.append(...tempDiv.childNodes);
     } catch (error) {
@@ -79,14 +106,14 @@ async function Registration() { // Загрузка страницы регис�
 }
 async function ChangePassword() { // Загрузка страницы регистрации
     try {
-      // 1. Загружаем HTML
+    // 1. Загружаем HTML
         const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
         const data = await response.json();
         const htmlContent = atob(data.content);
-      // 2. Создаём временный контейнер
+    // 2. Создаём временный контейнер
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
-      // 3. Переносим скрипты
+    // 3. Переносим скрипты
         const scripts = tempDiv.querySelectorAll('script');
         scripts.forEach(script => {
             const newScript = document.createElement('script');
@@ -97,11 +124,102 @@ async function ChangePassword() { // Загрузка страницы реги�
             }
             document.body.appendChild(newScript);
         });
-      // 4. Вставляем остальное содержимое
+    // 4. Вставляем остальное содержимое
         document.body.innerHTML = '';
         document.body.append(...tempDiv.childNodes);
     } catch (error) {
         console.error('Ошибка загрузки:', error);
+    }
+}
+async function ToDo() { // Загрузка страницы с задачами
+    try {
+    // 1. Загружаем HTML
+        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/todo.html');
+        const data = await response.json();
+        const htmlContent = atob(data.content);
+    // 2. Создаём временный контейнер
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+    // 3. Переносим скрипты
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            if(script.src) {
+                newScript.src = script.src;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+        });
+    // 4. Вставляем остальное содержимое
+        document.body.innerHTML = '';
+        document.body.append(...tempDiv.childNodes);
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+    }
+}
+
+// ПРОВЕРКИ
+async function checkEmailAndMessage(yourEmail) { // Проверяем и находим email
+    const users = await getDataBaseUser();
+
+    let em = '';
+    let code = 0;
+
+    for (const user of users) {
+        if (user.email == yourEmail) {
+            em = yourEmail;
+            code = user.code;
+            break;
+        }
+    }
+    return [em, code];
+}
+function isEmptySignUp(code, pasOne, pasTwo) { // Все поля заполнены
+    return !code || !pasOne || !pasTwo;
+}
+function checkPasswordsOnCoincidence(passwordOne, passwordTwo) { // Введенные пароли совпадают
+    return passwordOne != passwordTwo;
+}
+async function checkCode(yourCode) { // Проверка на совпадение кода
+    const users = await getDataBaseUser();
+
+    for (const user of users) {
+        if (user.email == email && user.code == yourCode) {
+            return false;
+        }
+    }
+    return true;
+}
+
+async function setCode() { // Отправляем код
+    email = document.getElementById('email').value;
+    const emAndCode = checkEmailAndMessage(email);
+
+    if (emAndCode[0] == '') {
+        loshara.innerHTML = `<p style="color: red;">No email in DataBase</p>`;
+    }
+    else {
+        const response = await fetch("http://localhost/message.php?email=" . urlencode(email + code));
+    }
+}
+
+function changePassword() { // Смена пароля после получения кода
+    code = document.getElementById('code').value;
+    passOne = document.getElementById('passwordOne').value;
+    passTwo = document.getElementById('passwordTwo').value;
+
+    if (isEmptySignUp(code, pasOne, pasTwo)) {
+        losharaTwo.innerHTML = `<p style="color: red;">Need write all input</p>`;
+    }
+    else if (checkPasswordsOnCoincidence(passOne, passTwo)) {
+        losharaTwo.innerHTML = `<p style="color: red;">Passwords not toghtether</p>`;
+    }
+    else if (checkCode(code)) {
+        losharaTwo.innerHTML = `<p style="color: red;">Code not this</p>`;
+    }
+    else {
+
     }
 }
 </script>
