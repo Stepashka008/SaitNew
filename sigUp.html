@@ -192,7 +192,7 @@ async function checkUserYetInDataBase(yourEmail) { // Такой пользов�
     for (const user of users) {
         console.log(yourEmail);
         console.log(user.email);
-        if (user.email === yourEmail) {
+        if (user.email == yourEmail) {
             console.log(user.email + " - " + yourEmail);
             return true;
         }
