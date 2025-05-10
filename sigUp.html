@@ -23,9 +23,21 @@
         }
     ?>
 <script>
+// Глобальная переменная для БД
+let userDatabaseCache = null;
+let lastFetchTime = 0;
+const CACHE_LIFETIME = 5 * 60 * 1000; // 5 минут в миллисекундах
+
 // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
-async function getDataBaseUser() {
+async function getDataBaseUser(forceRefresh = false) {
+    // Если есть кэш и он еще актуален, и не требуется принудительное обновление
+    if (userDatabaseCache && Date.now() - lastFetchTime < CACHE_LIFETIME && !forceRefresh) {
+        console.log('Returning cached user database');
+        return userDatabaseCache;
+    }
+
     try {
+        console.log('Fetching fresh user database...');
         const response = await fetch('http://localhost/conect.php');
         
         if (!response.ok) {
@@ -38,13 +50,63 @@ async function getDataBaseUser() {
             throw new Error(`Server error: ${data.error || 'Unknown error'}`);
         }
         
-        // Нормализация данных - всегда возвращаем массив
-        return Array.isArray(data.data) ? data.data : [data.data];
+        // Нормализация и кэширование данных
+        userDatabaseCache = Array.isArray(data.data) ? data.data : [data.data];
+        lastFetchTime = Date.now();
+        
+        // Сохраняем в localStorage для persistence между перезагрузками страницы
+        try {
+            localStorage.setItem('userDatabaseCache', JSON.stringify({
+                data: userDatabaseCache,
+                timestamp: lastFetchTime
+            }));
+        } catch (e) {
+            console.warn('Failed to save to localStorage:', e);
+        }
+        
+        return userDatabaseCache;
     } catch (error) {
         console.error('Failed to fetch users:', error);
-        throw error; // Позволяет обработать ошибку на уровне вызова
+        
+        // В случае ошибки пробуем вернуть данные из localStorage
+        try {
+            const cached = JSON.parse(localStorage.getItem('userDatabaseCache'));
+            if (cached && cached.data) {
+                console.warn('Using stale data from localStorage due to fetch error');
+                return cached.data;
+            }
+        } catch (e) {
+            console.warn('Failed to parse cached data:', e);
+        }
+        
+        throw error;
     }
 }
+(async function initUserDatabase() {
+    try {
+        // Пробуем загрузить из localStorage
+        const cached = JSON.parse(localStorage.getItem('userDatabaseCache'));
+        if (cached && cached.data && cached.timestamp) {
+            userDatabaseCache = cached.data;
+            lastFetchTime = cached.timestamp;
+            
+            // Проверяем актуальность данных
+            if (Date.now() - lastFetchTime < CACHE_LIFETIME) {
+                console.log('Initialized user database from cache');
+            } else {
+                // Фоновая загрузка свежих данных
+                getDataBaseUser(true).catch(e => 
+                    console.warn('Background refresh failed:', e)
+                );
+            }
+        } else {
+            // Первоначальная загрузка
+            await getDataBaseUser();
+        }
+    } catch (e) {
+        console.error('Initialization error:', e);
+    }
+})();
 
 // ХЭШИРОВАНИЕ ПАРОЛЯ
 function hashing(input) { // Хэширование
@@ -186,10 +248,8 @@ function checkEmail(email) { // Email введен верно
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return !emailRegex.test(email);
 }
-async function checkUserYetInDataBase(yourEmail) { // Такой пользователь уже есть в БД
-    const users = await getDataBaseUser();
-
-    console.log(users);
+function checkUserYetInDataBase(yourEmail) { // Такой пользователь уже есть в БД
+    const users = userDatabaseCache ;
 
     for (const user of users) {
         if (user.email == yourEmail) {
@@ -206,7 +266,10 @@ function checkSESSION() { // Находится ли пользователь в
 }
 
 // ЗАПИСЬ В БД
-async function saveInDataBase(fulname, surnames, gen, em, pasOne, ag) {
+async function saveInDataBase(fulname, surnames, gen, em, pasOnes, ag) {
+
+    const pasOne = hashing(pasOnes);
+
     const idis = Math.floor(Math.random()*90000) + 10000;
     const actives = false;
     const codes = Math.floor(Math.random()*9000000000) + 1000000000;
@@ -270,9 +333,9 @@ function checkingAndRegistration() {
         else if (checkAge(age)) {
             loshara.innerHTML = `<p style="color: red;">Age not right</p>`;
         }
-        /*else if (checkUserYetInDataBase(email)) {
+        else if (checkUserYetInDataBase(email)) {
             loshara.innerHTML = `<p style="color: red;">User yet in Data Base</p>`;
-        }*/
+        }
         else {
             saveInDataBase(fulname, surname, gender, email, pasOne, age); // Сохранение в БД
             Vxod(); // Переход на страницу с задачами
