@@ -188,13 +188,14 @@ function checkEmail(email) { // Email введен верно
     return !emailRegex.test(email);
 }
 async function checkUserYetInDataBase(yourEmail) { // Такой пользователь уже есть в БД
-    const users = await getDataBaseUser(); // Получение базы данных пользователей
-    users.forEach(user => {
+    const users = await getDataBaseUser();
+    
+    for (const user of users) {
         console.log(user.email);
-        if (user.email == yourEmail) {
-            return true; // Пользователь уже есть в БД
+        if (user.email === yourEmail) {
+            return true;
         }
-    });
+    }
     return false;
 }
 function checkSESSION() { // Находится ли пользователь в сессии
