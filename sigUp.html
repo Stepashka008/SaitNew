@@ -268,9 +268,9 @@ function checkingAndRegistration() {
         else if (checkAge(age)) {
             loshara.innerHTML = `<p style="color: red;">Age not right</p>`;
         }
-        else if (checkUserYetInDataBase(email)) {
+        /*else if (checkUserYetInDataBase(email)) {
             loshara.innerHTML = `<p style="color: red;">User yet in Data Base</p>`;
-        }
+        }*/
         else {
             saveInDataBase(fulname, surname, gender, email, pasOne, age); // Сохранение в БД
             Vxod(); // Переход на страницу с задачами
