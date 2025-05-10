@@ -1,9 +1,9 @@
     <div id="Open">
         <p id="Sig">SinglUp</p>
         <form id="SinglInForm">
-            <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
-                <p id="lox"><?php echo $_GET['errors'] ?></p> <!-- Вывод, что нужно заполнить поля -->
-            <?php } ?>
+            <div name="di" id="lox">
+                
+            </div>
             <input name="namePerson" id="namePerson" type="text" class="Inp" placeholder="Name">
             <input name="surname" id="surname" type="text" class="Inp" placeholder="Surname">
             <input name="age" id="age" type="text" class="Inp" placeholder="Age">
