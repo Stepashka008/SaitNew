@@ -23,12 +23,25 @@
         }
     ?>
 <script>
+// Глобальная переменная для хранения кэша
+let userDatabaseCache = null;
+let lastFetchTime = 0;
+const CACHE_LIFETIME = 5 * 60 * 1000; // 5 минут в миллисекундах
+
+
 let email = '';
 const loshara = document.getElementById('lox');
 const losharaTwo = document.getElementById('loxTwo');
 // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
-async function getDataBaseUser() {
+async function getDataBaseUser(forceRefresh = false) {
+    // Если есть кэш и он еще актуален, и не требуется принудительное обновление
+    if (userDatabaseCache && Date.now() - lastFetchTime < CACHE_LIFETIME && !forceRefresh) {
+        console.log('Returning cached user database');
+        return userDatabaseCache;
+    }
+
     try {
+        console.log('Fetching fresh user database...');
         const response = await fetch('http://localhost/conect.php');
         
         if (!response.ok) {
@@ -41,13 +54,65 @@ async function getDataBaseUser() {
             throw new Error(`Server error: ${data.error || 'Unknown error'}`);
         }
         
-        // Нормализация данных - всегда возвращаем массив
-        return Array.isArray(data.data) ? data.data : [data.data];
+        // Нормализация и кэширование данных
+        userDatabaseCache = Array.isArray(data.data) ? data.data : [data.data];
+        lastFetchTime = Date.now();
+        
+        // Сохраняем в localStorage для persistence между перезагрузками страницы
+        try {
+            localStorage.setItem('userDatabaseCache', JSON.stringify({
+                data: userDatabaseCache,
+                timestamp: lastFetchTime
+            }));
+        } catch (e) {
+            console.warn('Failed to save to localStorage:', e);
+        }
+        
+        return userDatabaseCache;
     } catch (error) {
         console.error('Failed to fetch users:', error);
-        throw error; // Позволяет обработать ошибку на уровне вызова
+        
+        // В случае ошибки пробуем вернуть данные из localStorage
+        try {
+            const cached = JSON.parse(localStorage.getItem('userDatabaseCache'));
+            if (cached && cached.data) {
+                console.warn('Using stale data from localStorage due to fetch error');
+                return cached.data;
+            }
+        } catch (e) {
+            console.warn('Failed to parse cached data:', e);
+        }
+        
+        throw error;
     }
 }
+
+// Инициализация при загрузке страницы
+(async function initUserDatabase() {
+    try {
+        // Пробуем загрузить из localStorage
+        const cached = JSON.parse(localStorage.getItem('userDatabaseCache'));
+        if (cached && cached.data && cached.timestamp) {
+            userDatabaseCache = cached.data;
+            lastFetchTime = cached.timestamp;
+            
+            // Проверяем актуальность данных
+            if (Date.now() - lastFetchTime < CACHE_LIFETIME) {
+                console.log('Initialized user database from cache');
+            } else {
+                // Фоновая загрузка свежих данных
+                getDataBaseUser(true).catch(e => 
+                    console.warn('Background refresh failed:', e)
+                );
+            }
+        } else {
+            // Первоначальная загрузка
+            await getDataBaseUser();
+        }
+    } catch (e) {
+        console.error('Initialization error:', e);
+    }
+})();
 
 // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
 async function Vxod() { // Загрузка страницы входа
@@ -160,8 +225,10 @@ async function ToDo() { // Загрузка страницы с задачами
 }
 
 // ПРОВЕРКИ
-async function checkEmailAndMessage(yourEmail) { // Проверяем и находим email
-    const users = await getDataBaseUser();
+function checkEmailAndMessage(yourEmail) { // Проверяем и находим email
+    const users = userDatabaseCache;
+
+    console.log(users);
 
     for (const user of users) {
         if (user.email == yourEmail) {
