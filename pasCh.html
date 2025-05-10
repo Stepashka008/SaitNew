@@ -23,15 +23,16 @@
         }
     ?>
 <script>
-// Глобальная переменная для хранения кэша
+// Глобальная переменная для БД
 let userDatabaseCache = null;
 let lastFetchTime = 0;
 const CACHE_LIFETIME = 5 * 60 * 1000; // 5 минут в миллисекундах
 
-
+// Мои переменный
 let email = '';
 const loshara = document.getElementById('lox');
 const losharaTwo = document.getElementById('loxTwo');
+
 // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
 async function getDataBaseUser(forceRefresh = false) {
     // Если есть кэш и он еще актуален, и не требуется принудительное обновление
@@ -86,8 +87,6 @@ async function getDataBaseUser(forceRefresh = false) {
         throw error;
     }
 }
-
-// Инициализация при загрузке страницы
 (async function initUserDatabase() {
     try {
         // Пробуем загрузить из localStorage
