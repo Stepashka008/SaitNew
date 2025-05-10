@@ -163,17 +163,12 @@ async function ToDo() { // Загрузка страницы с задачами
 async function checkEmailAndMessage(yourEmail) { // Проверяем и находим email
     const users = await getDataBaseUser();
 
-    let em = '';
-    let code = 0;
-
     for (const user of users) {
         if (user.email == yourEmail) {
-            em = yourEmail;
-            code = user.code;
-            break;
+            return user.code;
         }
     }
-    return [em, code];
+    return 0;
 }
 function isEmptySignUp(code, pasOne, pasTwo) { // Все поля заполнены
     return !code || !pasOne || !pasTwo;
@@ -194,13 +189,14 @@ async function checkCode(yourCode) { // Проверка на совпадени
 
 async function setCode() { // Отправляем код
     email = document.getElementById('email').value;
-    const emAndCode = checkEmailAndMessage(email);
+    const Code = checkEmailAndMessage(email); // ПРОБЛЕМА С НАХОЖДЕНИЕМ
 
-    if (emAndCode[0] == '') {
+    if (Code == 0) {
         loshara.innerHTML = `<p style="color: red;">No email in DataBase</p>`;
     }
     else {
-        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(emAndCode[1])}`);
+        loshara.innerHTML = `<p style="color: black;">Write Code</p>`;
+        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(Code)}`);
     }
 }
 
