@@ -200,7 +200,7 @@ async function setCode() { // Отправляем код
         loshara.innerHTML = `<p style="color: red;">No email in DataBase</p>`;
     }
     else {
-        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(emAndCode[0])}&code=${encodeURIComponent(emAndCode[1])}`);
+        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(emAndCode[1])}`);
     }
 }
 
