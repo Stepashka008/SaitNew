@@ -1,18 +1,18 @@
 <div id="Open">
         <p id="Sig">ReceptionPassword</p>
-        <form method="POST" action="../included/recept.inc.php" id="SinglInForm">
+        <form id="SinglInForm">
             <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
                 <p id="lox"><?php echo $_GET['errors'] ?></p> <!-- Вывод, что нужно заполнить поля -->
             <?php } ?>
             <input name="email" type="text" class="Inp" placeholder="Login/Email">
-            <button type="submit">Send</button>
+            <button type="button">Send</button>
         </form>
-        <form method="POST" action="../included/recept.inc.php" id="SinglInForm">
+        <form id="SinglInForm">
             <p id="loxTwo"></p><!-- Проверка на лоха-->
             <input name="code" type="text" class="Inp" id="code" placeholder="Code">
             <input name="passwordOne" type="password" class="Inp" id="pasOne" placeholder="Password">
             <input name="passwordTwo" type="password" class="Inp" id="pasTwo" placeholder="Password">
-            <button type="submit">Сhange</button>
+            <button type="button">Сhange</button>
     </div>
         <a onclick="Vxod()" href="#" class="SinglUp">SignlIn</a>
         <a onclick="Registration()" href="#" class="ReceptionPassword">SignlUp</a>
