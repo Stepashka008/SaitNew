@@ -191,6 +191,7 @@ async function checkUserYetInDataBase(yourEmail) { // Такой пользов�
     const users = await getDataBaseUser();
     
     for (const user of users) {
+        console.log(yourEmail);
         console.log(user.email);
         if (user.email === yourEmail) {
             console.log(user.email + " - " + yourEmail);
