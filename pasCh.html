@@ -1,52 +1,59 @@
 <style>
-       #Open {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 450px;
-    margin: 30px auto;
+   #Open {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    max-width: 420px;
+    margin: 40px auto;
     padding: 30px;
-    background: #ffffff;
+    background: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     text-align: center;
 }
 
 #Sig {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
-    color: #2c3e50;
+    color: #2d3748;
     margin-bottom: 25px;
-    text-align: center;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+#Sig::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+    background: linear-gradient(90deg, #4299e1, #3182ce);
+    border-radius: 3px;
 }
 
 #SinglInForm {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 16px;
 }
 
 .Inp {
     padding: 14px 16px;
-    border: 1px solid #e0e0e0;
+    border: 2px solid #edf2f7;
     border-radius: 8px;
     font-size: 15px;
-    transition: all 0.3s ease;
-    background-color: #f9f9f9;
+    transition: all 0.25s ease;
+    background-color: #f8fafc;
 }
 
 .Inp:focus {
     outline: none;
-    border-color: #4285f4;
-    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+    border-color: #4299e1;
     background-color: #fff;
-}
-
-.Inp::placeholder {
-    color: #999;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
 }
 
 button[type="button"] {
-    background-color: #4285f4;
+    background: linear-gradient(135deg, #4299e1, #3182ce);
     color: white;
     border: none;
     padding: 14px;
@@ -55,63 +62,67 @@ button[type="button"] {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 10px;
-    width: 100%;
+    margin-top: 8px;
 }
 
 button[type="button"]:hover {
-    background-color: #3367d6;
     transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(49, 130, 206, 0.3);
 }
 
 button[type="button"]:active {
     transform: translateY(0);
 }
 
-.SinglIn, .ReceptionPassword {
-    display: inline-block;
-    margin: 10px 5px 0;
-    color: #4285f4;
-    text-decoration: none;
+#lox, #loxTwo {
+    min-height: 20px;
+    padding: 10px;
+    border-radius: 6px;
     font-size: 14px;
-    transition: all 0.2s ease;
-    padding: 6px 12px;
-    border-radius: 4px;
-}
-
-.SinglIn:hover, .ReceptionPassword:hover {
-    color: #3367d6;
-    background-color: #f0f7ff;
-    text-decoration: none;
+    margin-bottom: 5px;
+    display: none; /* По умолчанию скрыты */
 }
 
 #lox {
-    min-height: 20px;
-    color: #ea4335;
-    font-size: 14px;
-    margin-bottom: 5px;
-    padding: 8px;
-    border-radius: 4px;
-    background-color: #fce8e6;
-    display: none; /* Скрыто по умолчанию */
+    background-color: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
 }
 
-/* Адаптивность для мобильных устройств */
+#loxTwo {
+    background-color: #f0fff4;
+    color: #38a169;
+    border: 1px solid #c6f6d5;
+}
+
+/* Стили для разделения между этапами */
+#code, #passwordOne, #passwordTwo {
+    display: none; /* Скрыты до отправки кода */
+}
+
+/* Показываем вторую часть формы при необходимости */
+.show-second-step #code,
+.show-second-step #passwordOne,
+.show-second-step #passwordTwo,
+.show-second-step button[onclick="changePassword()"] {
+    display: block;
+}
+
+/* Адаптивность */
 @media (max-width: 480px) {
     #Open {
-        padding: 20px;
+        padding: 25px 20px;
         margin: 20px 15px;
     }
     
     #Sig {
-        font-size: 24px;
-        margin-bottom: 20px;
+        font-size: 22px;
     }
     
     .Inp {
         padding: 12px 14px;
     }
-} 
+}
 </style>
 
 <div id="Open">
