@@ -244,7 +244,7 @@ async function checkEmailAndMessage(yourEmail) {
         }
     }
 
-    // Нормализуем email для сравнения (регистронезависимо)
+    // Нормализуем email для сравнения
     const emailToFind = yourEmail.trim().toLowerCase();
     
     for (const user of userDatabaseCache) {
@@ -306,14 +306,30 @@ async function checkCode(yourCode) {
 // Отправка кода
 async function setCode() { // Отправляем код
     email = document.getElementById('email').value;
-    const Code = checkEmailAndMessage(email); // ПРОБЛЕМА С НАХОЖДЕНИЕМ
-
-    if (Code == 0) {
-        loshara.innerHTML = `<p style="color: red;">No email in DataBase</p>`;
-    }
-    else {
-        loshara.innerHTML = `<p style="color: black;">Write Code</p>`;
-        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(Code)}`);
+    
+    try {
+        // Добавляем await для получения результата
+        const result = await checkEmailAndMessage(email);
+        
+        if (!result.found || result.code === 0) {
+            loshara.innerHTML = `<p style="color: red;">Email не найден в базе данных</p>`;
+            return;
+        }
+        
+        loshara.innerHTML = `<p style="color: black;">Введите код: ${result.code}</p>`;
+        
+        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(result.code)}`);
+        
+        if (!response.ok) {
+            throw new Error('Ошибка при отправке кода');
+        }
+        
+        const responseData = await response.json();
+        console.log("Ответ сервера:", responseData);
+        
+    } catch (error) {
+        console.error("Ошибка:", error);
+        loshara.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
     }
 }
 
