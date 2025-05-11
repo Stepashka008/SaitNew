@@ -187,9 +187,8 @@ async function ToDo() { // Загрузка страницы с задачами
 
 // ПРОВЕРКИ
 function checkEmailAndMessage(yourEmail) { // Проверяем и находим email
-    const users = globalUserData;
 
-    for (const user of users) {
+    for (const user of globalUserData) {
         if (user.email == yourEmail) {
             return user.code;
         }
@@ -203,9 +202,8 @@ function checkPasswordsOnCoincidence(passwordOne, passwordTwo) { // Введен
     return passwordOne != passwordTwo;
 }
 async function checkCode(yourCode) { // Проверка на совпадение кода
-    const users = globalUserData;
 
-    for (const user of users) {
+    for (const user of globalUserData) {
         if (user.email == email && user.code == yourCode) {
             return false;
         }
