@@ -113,6 +113,14 @@ async function getDataBaseUser(forceRefresh = false) {
     }
 })();
 
+function hashing(input) { // Хэширование
+    const hash = new Uint8Array(32); // Создаем массив для хранения хэша
+    for (let i = 0; i < input.length; i++) {
+        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256; // Хэшируем каждый символ
+    }
+    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join(''); // Преобразуем массив байт в шестнадцатеричную строку
+}
+
 // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
 async function Vxod() { // Загрузка страницы входа
     try {
@@ -318,7 +326,7 @@ function changePassword() { // Смена пароля после получен
         losharaTwo.innerHTML = `<p style="color: red;">Code not this</p>`;
     }*/
     else {
-        changeUserPassword(code, passOne);
+        changeUserPassword(code, hashing(passOne));
         Vxod();
     }
 }
