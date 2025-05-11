@@ -1,4 +1,82 @@
-    <div id="Open" onload="checkSESSION()">
+<style>
+#Open {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#Sig {
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+#SinglInForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.Inp {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border 0.3s;
+}
+
+.Inp:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+#submitBtn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+#submitBtn:hover {
+    background-color: #2980b9;
+}
+
+.SinglUp, .ReceptionPassword {
+    display: block;
+    margin-top: 15px;
+    color: #3498db;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.SinglUp:hover, .ReceptionPassword:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+#lox {
+    min-height: 20px;
+    color: #e74c3c;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+</style>
+
+<div id="Open" onload="checkSESSION()">
         <p id="Sig">SinglIn</p>
         <form id="SinglInForm">
             <div name="di" id="lox">
@@ -11,6 +89,7 @@
         <a onclick="Registration()" href="#" class="SinglUp">Registration</a>
         <a onclick="ChangePassword()" href="#" class="ReceptionPassword">Change Password</a>
     </div>
+
 <script>
   // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
 function getDataBaseUser() {
