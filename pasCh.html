@@ -113,6 +113,7 @@ async function getDataBaseUser(forceRefresh = false) {
     }
 })();
 
+// ХЭШИРОВАНИЕ ПАРОЛЯ
 function hashing(input) { // Хэширование
     const hash = new Uint8Array(32); // Создаем массив для хранения хэша
     for (let i = 0; i < input.length; i++) {
