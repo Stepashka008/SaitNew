@@ -140,12 +140,14 @@ button[type="button"]:active {
     ?>
 
 <script>
+// ФАЙЛ Reception.js
+
 // Глобальная переменная для БД
 let userDatabaseCache = null;
 let lastFetchTime = 0;
 const CACHE_LIFETIME = 5 * 60 * 1000; // 5 минут в миллисекундах
 
-// Мои переменный
+// Мои переменные
 let email = '';
 const loshara = document.getElementById('lox');
 const losharaTwo = document.getElementById('loxTwo');
@@ -204,6 +206,7 @@ async function getDataBaseUser(forceRefresh = false) {
         throw error;
     }
 }
+
 (async function initUserDatabase() {
     try {
         // Пробуем загрузить из localStorage
@@ -231,155 +234,122 @@ async function getDataBaseUser(forceRefresh = false) {
 })();
 
 // ХЭШИРОВАНИЕ ПАРОЛЯ
-function hashing(input) { // Хэширование
-    const hash = new Uint8Array(32); // Создаем массив для хранения хэша
+function hashing(input) {
+    if (!input) return ''; // Добавлена проверка на пустой ввод
+    const hash = new Uint8Array(32);
     for (let i = 0; i < input.length; i++) {
-        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256; // Хэшируем каждый символ
+        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256;
     }
-    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join(''); // Преобразуем массив байт в шестнадцатеричную строку
+    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// ОБЩАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ СТРАНИЦ
+async function loadPage(url) {
+    try {
+        const response = await fetch(`http://localhost/proxy.php?error=${encodeURIComponent(url)}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        const htmlContent = atob(data.content);
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        
+        document.body.innerHTML = '';
+        
+        const nodes = Array.from(tempDiv.childNodes).filter(node => node.nodeName !== 'SCRIPT');
+        document.body.append(...nodes);
+        
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            if (script.src) {
+                newScript.src = script.src;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        document.body.innerHTML = `<p style="color: red;">Ошибка загрузки страницы: ${error.message}</p>`;
+    }
 }
 
 // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
-async function Vxod() { // Загрузка страницы входа
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+async function Vxod() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
 }
-async function Registration() { // Загрузка страницы регистрации
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function Registration() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
 }
-async function ChangePassword() { // Загрузка страницы регистрации
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function ChangePassword() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
 }
-async function ToDo() { // Загрузка страницы с задачами
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/todo.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function ToDo() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/todo.html');
 }
 
 // ПРОВЕРКИ
 async function checkEmailAndMessage(yourEmail) {
-    // Убедимся, что база данных загружена
-    if (!userDatabaseCache) {
-        try {
-            await getDataBaseUser();
-        } catch (error) {
-            console.error("Ошибка загрузки базы данных:", error);
-            return { found: false, code: 0 };
-        }
-    }
-
-    // Нормализуем email для сравнения
-    const emailToFind = yourEmail.trim().toLowerCase();
+    if (!yourEmail) return { found: false, code: 0 };
     
-    for (const user of userDatabaseCache) {
-        if (user.email.trim().toLowerCase() === emailToFind) {
-            return { found: true, code: user.code };
-        }
-    }
-    return { found: false, code: 0 };
-}
-async function setCode() {
-    email = document.getElementById('email').value.trim();
-    
-    if (!email) {
-        loshara.innerHTML = `<p style="color: red;">Введите email</p>`;
-        return;
-    }
-
     try {
+        if (!userDatabaseCache) {
+            await getDataBaseUser();
+        }
+
+        const emailToFind = yourEmail.trim().toLowerCase();
+        const user = userDatabaseCache.find(u => u.email?.trim().toLowerCase() === emailToFind);
+        
+        return user 
+            ? { found: true, code: user.code } 
+            : { found: false, code: 0 };
+    } catch (error) {
+        console.error("Ошибка проверки email:", error);
+        return { found: false, code: 0 };
+    }
+}
+
+function isEmptySignUp(code, pasOne, pasTwo) {
+    return !code || !pasOne || !pasTwo;
+}
+
+function checkPasswordsOnCoincidence(passwordOne, passwordTwo) {
+    return passwordOne !== passwordTwo; // Исправлено != на !==
+}
+
+async function checkCode(yourCode) {
+    if (!yourCode || !email) return true;
+    
+    try {
+        if (!userDatabaseCache) {
+            await getDataBaseUser();
+        }
+        
+        return !userDatabaseCache.some(user => 
+            user.email?.toLowerCase() === email.toLowerCase() && 
+            user.code == yourCode
+        );
+    } catch (error) {
+        console.error("Ошибка проверки кода:", error);
+        return true;
+    }
+}
+
+// ОТПРАВКА КОДА И СМЕНА ПАРОЛЯ
+async function setCode() {
+    try {
+        email = document.getElementById('email')?.value.trim();
+        
+        if (!email) {
+            loshara.innerHTML = `<p style="color: red;">Введите email</p>`;
+            return;
+        }
+
         const result = await checkEmailAndMessage(email);
         
         if (!result.found) {
@@ -387,9 +357,18 @@ async function setCode() {
             return;
         }
 
-        loshara.innerHTML = `<p style="color: black;">Введите код</p>`;
+        loshara.innerHTML = `<p style="color: green;">Код отправлен на email</p>`;
         
-        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(result.code)}`);
+        const response = await fetch(`http://localhost/message.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                code: result.code
+            })
+        });
         
         if (!response.ok) {
             throw new Error(`Ошибка сервера: ${response.status}`);
@@ -403,121 +382,74 @@ async function setCode() {
         loshara.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
     }
 }
-function isEmptySignUp(code, pasOne, pasTwo) { // Все поля заполнены
-    return !code || !pasOne || !pasTwo;
-}
-function checkPasswordsOnCoincidence(passwordOne, passwordTwo) { // Введенные пароли совпадают
-    return passwordOne != passwordTwo;
-}
-async function checkCode(yourCode) {
-    if (!userDatabaseCache) {
-        await getDataBaseUser();
-    }
-    
-    return !userDatabaseCache.some(user => 
-        user.email.toLowerCase() === email.toLowerCase() && 
-        user.code == yourCode
-    );
-}
-
-// Отправка кода
-async function setCode() { // Отправляем код
-    email = document.getElementById('email').value;
-    
-    try {
-        // Добавляем await для получения результата
-        const result = await checkEmailAndMessage(email);
-        
-        if (!result.found || result.code === 0) {
-            loshara.innerHTML = `<p style="color: red;">Email не найден в базе данных</p>`;
-            return;
-        }
-        
-        loshara.innerHTML = `<p style="color: black;">Введите код: ${result.code}</p>`;
-        
-        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(result.code)}`);
-        
-        if (!response.ok) {
-            throw new Error('Ошибка при отправке кода');
-        }
-        
-        const responseData = await response.json();
-        console.log("Ответ сервера:", responseData);
-        
-    } catch (error) {
-        console.error("Ошибка:", error);
-        loshara.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
-    }
-}
 
 async function changeUserPassword(code, newPassword) {
-    let check = false;
-    for (const user of userDatabaseCache) {
-        if (user.email == email && user.code == code) {
-            check = true;
+    try {
+        const response = await fetch('http://localhost/changePassword.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                code: code,
+                new_password: hashing(newPassword)
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    }
-
-
-    if (check) {
-        try {
-            const response = await fetch('http://localhost/changePassword.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: email,
-                    new_password: newPassword
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                console.log('Пароль успешно изменен');
-                return true;
-            } else {
-                console.error('Ошибка:', result.message);
-                return false;
-            }
-        } catch (error) {
-            console.error('Ошибка сети:', error);
-            return false;
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error(result.message || 'Не удалось изменить пароль');
         }
+        
+        return true;
+    } catch (error) {
+        console.error('Ошибка при изменении пароля:', error);
+        return false;
     }
 }
 
 async function changePassword() {
-    const code = document.getElementById('code').value.trim();
-    const passOne = document.getElementById('passwordOne').value;
-    const passTwo = document.getElementById('passwordTwo').value;
-
-    if (!code || !passOne || !passTwo) {
-        losharaTwo.innerHTML = `<p style="color: red;">Заполните все поля</p>`;
-        return;
-    }
-
-    if (passOne !== passTwo) {
-        losharaTwo.innerHTML = `<p style="color: red;">Пароли не совпадают</p>`;
-        return;
-    }
-
     try {
-        // Проверяем код асинхронно
+        const code = document.getElementById('code')?.value.trim();
+        const passOne = document.getElementById('passwordOne')?.value;
+        const passTwo = document.getElementById('passwordTwo')?.value;
+
+        if (!losharaTwo) throw new Error('Элемент для вывода ошибок не найден');
+        
+        if (isEmptySignUp(code, passOne, passTwo)) {
+            losharaTwo.innerHTML = `<p style="color: red;">Заполните все поля</p>`;
+            return;
+        }
+
+        if (checkPasswordsOnCoincidence(passOne, passTwo)) {
+            losharaTwo.innerHTML = `<p style="color: red;">Пароли не совпадают</p>`;
+            return;
+        }
+
         const codeValid = await checkCode(code);
         if (codeValid) {
             losharaTwo.innerHTML = `<p style="color: red;">Неверный код</p>`;
             return;
         }
 
-        const success = await changeUserPassword(code, hashing(passOne));
+        const success = await changeUserPassword(code, passOne);
         if (success) {
-            await Vxod();
+            losharaTwo.innerHTML = `<p style="color: green;">Пароль успешно изменен</p>`;
+            setTimeout(Vxod, 2000); // Переход через 2 секунды
+        } else {
+            losharaTwo.innerHTML = `<p style="color: red;">Ошибка при изменении пароля</p>`;
         }
     } catch (error) {
         console.error("Ошибка при смене пароля:", error);
-        losharaTwo.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+        if (losharaTwo) {
+            losharaTwo.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+        }
     }
 }
 </script>
