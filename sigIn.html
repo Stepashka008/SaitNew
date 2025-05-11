@@ -91,226 +91,195 @@
     </div>
 
 <script>
-  // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
+ // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
 function getDataBaseUser() {
     return fetch('http://localhost/conect.php')
         .then(response => {
             if (!response.ok) {
-                throw new new Error('Ошибка сети: ' + response.statusText);
+                throw new Error('Ошибка сети: ' + response.statusText); // Убрал лишний new
             }
             return response.json();
         })
         .then(data => {
             if (data.success) {
-                // Преобразуем данные в массив
-                const dataArrayUser = Array.isArray(data.data) ? data.data : [data.data];
-                return dataArrayUser; // Возвращаем массив
+                return Array.isArray(data.data) ? data.data : [data.data];
             } else {
-                throw new Error("Ошибка в PHP: " + data.error);
+                throw new Error("Ошибка в PHP: " + (data.error || "Неизвестная ошибка")); // Добавил обработку отсутствия data.error
             }
         })
         .catch(error => {
             console.error("Ошибка:", error);
-            throw error; // Пробрасываем ошибку, чтобы её можно было обработать
+            throw error;
         });
 }
 
 // ХЭШИРОВАНИЕ ПАРОЛЯ
-function hashing(input) { // Хэширование
-    const hash = new Uint8Array(32); // Создаем массив для хранения хэша
+function hashing(input) {
+    if (!input) return ''; // Добавил проверку на пустой ввод
+    const hash = new Uint8Array(32);
     for (let i = 0; i < input.length; i++) {
-        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256; // Хэшируем каждый символ
+        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256;
     }
-    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join(''); // Преобразуем массив байт в шестнадцатеричную строку
+    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// ОБЩАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ СТРАНИЦ
+async function loadPage(url) {
+    try {
+        const response = await fetch(`http://localhost/proxy.php?error=${encodeURIComponent(url)}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        const htmlContent = atob(data.content);
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        
+        // Сначала очищаем body
+        document.body.innerHTML = '';
+        
+        // Переносим все элементы кроме скриптов
+        const nodes = Array.from(tempDiv.childNodes).filter(node => node.nodeName !== 'SCRIPT');
+        document.body.append(...nodes);
+        
+        // Затем добавляем скрипты
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            if (script.src) {
+                newScript.src = script.src;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        document.body.innerHTML = `<p style="color: red;">Ошибка загрузки страницы: ${error.message}</p>`;
+    }
 }
 
 // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
-async function Vxod() { // Загрузка страницы входа
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+async function Vxod() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
 }
-async function Registration() { // Загрузка страницы регистрации
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function Registration() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
 }
-async function ChangePassword() { // Загрузка страницы регистрации
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function ChangePassword() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
 }
-async function ToDo() { // Загрузка страницы с задачами
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/todo.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function ToDo() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/todo.html');
 }
 
 // ПРОВЕРКИ
-function isEmptySignIn(login, password) { // Нету пароля и логина
+function isEmptySignIn(login, password) {
     return !login && !password;
 }
-function isEmptyLogin(login) { // Нету логина
+
+function isEmptyLogin(login) {
     return !login;
 }
-function isEmptyPassword(password) { // Нету пароля
+
+function isEmptyPassword(password) {
     return !password;
 }
-async function checkOnUserSinglnIn(login, password) { // Такого пользователя нету в базе данных
-    const hashPassword = hashing(password.toString()); // Хэшируем пароль
-    const users = await getDataBaseUser(); // Получение базы данных пользователей
-    users.forEach(user => {
-        if (user.email == login && user.password == hashPassword) {
-            return false; // Есть в базе данных
-        }
-    });
-    return true;
+
+async function checkOnUserSinglnIn(login, password) {
+    try {
+        const hashPassword = hashing(password?.toString());
+        const users = await getDataBaseUser();
+        return !users.some(user => user.email === login && user.password === hashPassword); // Исправил логику проверки
+    } catch (error) {
+        console.error('Ошибка проверки пользователя:', error);
+        return true;
+    }
 }
-async function checkActivate(login) { // Неактивирован аккаунт
-    const users = await getDataBaseUser(); // Получение базы данных пользователей
-    users.forEach(user => {
-        if (user.email == login && user.activ == 1) {
-            return false; // Аккаунт активирован
-        }
-    });
-    return true;
+
+async function checkActivate(login) {
+    try {
+        const users = await getDataBaseUser();
+        return !users.some(user => user.email === login && user.activ == 1); // Исправил логику проверки
+    } catch (error) {
+        console.error('Ошибка проверки активации:', error);
+        return true;
+    }
 }
-function checkSESSION() { // Находится ли пользователь в сессии
-    const ses = JSON.parse(localStorage.getItem('mySESSION'));
-    if (ses.check) {
-        ToDo(); // Переход на страницу с задачами
+
+function checkSESSION() {
+    try {
+        const ses = JSON.parse(localStorage.getItem('mySESSION'));
+        if (ses?.check) {
+            ToDo();
+        }
+    } catch (error) {
+        console.error('Ошибка проверки сессии:', error);
     }
 }
 
 // ЗАПИСЬ В СЕССИЮ
-async function putSESSION(login, password) { // Запись
-    let ses = { id: 0, login: '', check: false};
-
-    const hashPassword = hashing(password.toString()); // Хэшируем пароль
-    const users = await getDataBaseUser(); // Получение базы данных пользователей
-    users.forEach(user => {
-        if (user.email == login && user.password == hashPassword) {
-            ses.id = user.id;
-            ses.login = user.email;
-            ses.check = true;
+async function putSESSION(login, password) {
+    try {
+        let ses = { id: 0, login: '', check: false };
+        const hashPassword = hashing(password?.toString());
+        const users = await getDataBaseUser();
+        
+        const user = users.find(user => user.email === login && user.password === hashPassword);
+        if (user) {
+            ses = { id: user.id, login: user.email, check: true };
         }
-    });
-
-    localStorage.setItem('mySESSION', JSON.stringify(data)); // Добавляем что пользователь в сессии
+        
+        localStorage.setItem('mySESSION', JSON.stringify(ses)); // Исправил переменную data на ses
+    } catch (error) {
+        console.error('Ошибка записи сессии:', error);
+    }
 }
 
-function checkingAndVxod() { // Выполнение проверок и вход после них
-    const login = document.getElementById('login').value;
-    const password = document.getElementById('pass').value;
-    const loshara = document.getElementById('lox');
+async function checkingAndVxod() {
+    try {
+        const login = document.getElementById('login')?.value;
+        const password = document.getElementById('pass')?.value;
+        const loshara = document.getElementById('lox');
+        
+        if (!loshara) throw new Error('Элемент для вывода ошибок не найден');
 
-    if (isEmptySignIn(login, password)) {
-        loshara.innerHTML = `<p style="color: red;">Write Login and Password</p>`;
-    }
-    else if (isEmptyLogin(login)) {
-        loshara.innerHTML = `<p style="color: red;">Write Login</p>`;
-    }
-    else if (isEmptyPassword(password)) {
-        loshara.innerHTML = `<p style="color: red;">Write Password</p>`;
-    }
-    // Две проверки не работают
-    /*else if (checkOnUserSinglnIn(login, password)) {
-        loshara.innerHTML = `<p style="color: red;">User no Data Base</p>`;
-    }
-    else if (checkActivate(login)) {
-        loshara.innerHTML = `<p style="color: red;">Account not activ</p>`;
-    }*/
-    else {
-        putSESSION(login, password); // Запись в сессию
-        ToDo(); // Переход на страницу с задачами
+        if (isEmptySignIn(login, password)) {
+            loshara.innerHTML = `<p style="color: red;">Write Login and Password</p>`;
+            return;
+        }
+        
+        if (isEmptyLogin(login)) {
+            loshara.innerHTML = `<p style="color: red;">Write Login</p>`;
+            return;
+        }
+        
+        if (isEmptyPassword(password)) {
+            loshara.innerHTML = `<p style="color: red;">Write Password</p>`;
+            return;
+        }
+        
+        if (await checkOnUserSinglnIn(login, password)) {
+            loshara.innerHTML = `<p style="color: red;">User not found in Data Base</p>`;
+            return;
+        }
+        
+        if (await checkActivate(login)) {
+            loshara.innerHTML = `<p style="color: red;">Account not activated</p>`;
+            return;
+        }
+        
+        await putSESSION(login, password);
+        await ToDo();
+    } catch (error) {
+        console.error('Ошибка входа:', error);
+        const loshara = document.getElementById('lox');
+        if (loshara) {
+            loshara.innerHTML = `<p style="color: red;">System error: ${error.message}</p>`;
+        }
     }
 }
 </script>
