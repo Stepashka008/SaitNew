@@ -227,8 +227,6 @@ async function ToDo() { // Загрузка страницы с задачами
 function checkEmailAndMessage(yourEmail) { // Проверяем и находим email
     const users = userDatabaseCache;
 
-    console.log(users);
-
     for (const user of users) {
         if (user.email == yourEmail) {
             return user.code;
@@ -266,12 +264,51 @@ async function setCode() { // Отправляем код
     }
 }
 
+async function changeUserPassword(code, newPassword) {
+    const users = userDatabaseCache;
+    let check = false;
+    for (const user of users) {
+        if (user.email == email && user.code == code) {
+            check = true;
+        }
+    }
+
+
+    if (check) {
+        try {
+            const response = await fetch('http://localhost/changePassword.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    new_password: newPassword
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('Пароль успешно изменен');
+                return true;
+            } else {
+                console.error('Ошибка:', result.message);
+                return false;
+            }
+        } catch (error) {
+            console.error('Ошибка сети:', error);
+            return false;
+        }
+    }
+}
+
 function changePassword() { // Смена пароля после получения кода
     code = document.getElementById('code').value;
     passOne = document.getElementById('passwordOne').value;
     passTwo = document.getElementById('passwordTwo').value;
 
-    if (isEmptySignUp(code, pasOne, pasTwo)) {
+    if (isEmptySignUp(code, passOne, passTwo)) {
         losharaTwo.innerHTML = `<p style="color: red;">Need write all input</p>`;
     }
     else if (checkPasswordsOnCoincidence(passOne, passTwo)) {
@@ -281,7 +318,8 @@ function changePassword() { // Смена пароля после получен
         losharaTwo.innerHTML = `<p style="color: red;">Code not this</p>`;
     }
     else {
-
+        changeUserPassword(code, passOne);
+        Vxod();
     }
 }
 </script>
