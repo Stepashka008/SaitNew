@@ -139,6 +139,8 @@ button[type="button"]:active {
         }
     ?>
 <script>
+// ФАЙЛ SinglUp.js
+
 // ПОЛУЧЕНИЕ БАЗЫ ДАННЫХ
 async function getDataBaseUser() {
     try {
@@ -158,185 +160,134 @@ async function getDataBaseUser() {
         return Array.isArray(data.data) ? data.data : [data.data];
     } catch (error) {
         console.error('Failed to fetch users:', error);
-        throw error; // Позволяет обработать ошибку на уровне вызова
+        throw error;
     }
 }
 
 // ХЭШИРОВАНИЕ ПАРОЛЯ
-function hashing(input) { // Хэширование
-    const hash = new Uint8Array(32); // Создаем массив для хранения хэша
+function hashing(input) {
+    if (!input) return ''; // Добавил проверку на пустой ввод
+    const hash = new Uint8Array(32);
     for (let i = 0; i < input.length; i++) {
-        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256; // Хэшируем каждый символ
+        hash[i % 32] = (hash[i % 32] + input.charCodeAt(i)) % 256;
     }
-    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join(''); // Преобразуем массив байт в шестнадцатеричную строку
+    return Array.from(hash).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// ОБЩАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ СТРАНИЦ
+async function loadPage(url) {
+    try {
+        const response = await fetch(`http://localhost/proxy.php?error=${encodeURIComponent(url)}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        const htmlContent = atob(data.content);
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        
+        document.body.innerHTML = '';
+        
+        const nodes = Array.from(tempDiv.childNodes).filter(node => node.nodeName !== 'SCRIPT');
+        document.body.append(...nodes);
+        
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            if (script.src) {
+                newScript.src = script.src;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        document.body.innerHTML = `<p style="color: red;">Ошибка загрузки страницы: ${error.message}</p>`;
+    }
 }
 
 // ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
-async function Vxod() { // Загрузка страницы входа
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+async function Vxod() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
 }
-async function Registration() { // Загрузка страницы регистрации
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function Registration() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
 }
-async function ChangePassword() { // Загрузка страницы регистрации
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function ChangePassword() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
 }
-async function ToDo() { // Загрузка страницы с задачами
-    try {
-    // 1. Загружаем HTML
-        const response = await fetch('http://localhost/proxy.php?error=https://api.github.com/repos/Stepashka008/SaitNew/contents/todo.html');
-        const data = await response.json();
-        const htmlContent = atob(data.content);
-    // 2. Создаём временный контейнер
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-    // 3. Переносим скрипты
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            if(script.src) {
-                newScript.src = script.src;
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            document.body.appendChild(newScript);
-        });
-    // 4. Вставляем остальное содержимое
-        document.body.innerHTML = '';
-        document.body.append(...tempDiv.childNodes);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
+
+async function ToDo() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/todo.html');
 }
 
 // ПРОВЕРКИ
-function isEmptySignUp(fulname, surname, gender, email, pasOne, pasTwo, age) { // Все поля заполнены
+function isEmptySignUp(fulname, surname, gender, email, pasOne, pasTwo, age) {
     return !fulname || !surname || !gender || !email || !pasOne || !pasTwo || !age;
 }
-function checkPasswordsOnCoincidence(passwordOne, passwordTwo) { // Введенные пароли совпадают
-    return passwordOne != passwordTwo;
+
+function checkPasswordsOnCoincidence(passwordOne, passwordTwo) {
+    return passwordOne !== passwordTwo; // Исправил != на !==
 }
-function checkPasswordOnSpecial(password) { // Пароль содержит спецсимволы и тд
+
+function checkPasswordOnSpecial(password) {
+    if (!password) return true;
     const specialChars = "!@#$%^&*()_+{}[]:;<>,.?~\\/-";
     const hasSpecialChar = [...specialChars].some(char => password.includes(char));
     const hasUpperCase = /[A-Z]/.test(password);
-    return !hasSpecialChar || !hasUpperCase || password.length < 6;
+    const hasNumber = /[0-9]/.test(password);
+    return !(hasSpecialChar && hasUpperCase && hasNumber && password.length >= 8); // Улучшенные требования к паролю
 }
-function checkAge(age) { // Возраст совпадает реальному
+
+function checkAge(age) {
     age = parseInt(age);
-    return isNaN(age) || age <= 0 || age >= 100;
+    return isNaN(age) || age < 14 || age > 120; // Более реалистичные границы возраста
 }
-function checkEmail(email) { // Email введен верно
+
+function checkEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return !emailRegex.test(email);
 }
-async function checkUserYetInDataBase(yourEmail) { // Такой пользователь уже есть в БД
-    const users = await getDataBaseUser();
 
-    console.log(users);
-
-    for (const user of users) {
-        if (user.email == yourEmail) {
-            chcek = true;
-        }
+async function checkUserYetInDataBase(yourEmail) {
+    try {
+        const users = await getDataBaseUser();
+        return users.some(user => user.email === yourEmail); // Исправил логику проверки
+    } catch (error) {
+        console.error('Error checking user existence:', error);
+        return false;
     }
-    return false;
 }
-function checkSESSION() { // Находится ли пользователь в сессии
-    const ses = JSON.parse(localStorage.getItem('mySESSION'));
-    if (ses.check) {
-        ToDo(); // Переход на страницу с задачами
+
+function checkSESSION() {
+    try {
+        const ses = JSON.parse(localStorage.getItem('mySESSION'));
+        if (ses?.check) {
+            ToDo();
+        }
+    } catch (error) {
+        console.error('Ошибка проверки сессии:', error);
     }
 }
 
 // ЗАПИСЬ В БД
-async function saveInDataBase(fulname, surnames, gen, em, pasOnes, ag) {
+async function saveInDataBase(fulname, surname, gender, email, password, age) {
+    const pasOne = hashing(password);
 
-    pasOne = hashing(pasOnes);
-
-    const idis = Math.floor(Math.random()*90000) + 10000;
+    const idis = Math.floor(Math.random() * 90000) + 10000;
     const actives = false;
-    const codes = Math.floor(Math.random()*9000000000) + 1000000000;
+    const codes = Math.floor(Math.random() * 900000) + 100000; // Уменьшил диапазон кода
 
     const data = {
         id: idis,
         name: fulname,
-        surname: surnames,
-        age: ag,
-        gender: gen,
-        email: em,
+        surname: surname,
+        age: parseInt(age),
+        gender: gender,
+        email: email,
         password: pasOne,
         activ: actives,
         code: codes
@@ -349,54 +300,74 @@ async function saveInDataBase(fulname, surnames, gen, em, pasOnes, ag) {
             body: JSON.stringify(data)
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const result = await response.json();
-        console.log(result); // Для отладки
         
         if (!result.success) {
-            throw new Error(result.message);
+            throw new Error(result.message || 'Unknown server error');
         }
         
         return result;
     } catch (error) {
-        console.error('Ошибка:', error);
-        throw error; // Пробрасываем ошибку дальше
+        console.error('Ошибка сохранения:', error);
+        throw error;
     }
 }
 
-function checkingAndRegistration() {
-    const fulname = document.getElementById('namePerson').value;
-    const surname = document.getElementById('surname').value;
-    const age = document.getElementById('age').value;
-    const gender = document.getElementById('gender').value;
-    const email = document.getElementById('email').value;
-    const pasOne = document.getElementById('passwordOne').value;
-    const pasTwo = document.getElementById('passwordTwo').value;
-    const loshara = document.getElementById('lox');
-    
-    if (isEmptySignUp(fulname, surname, gender, email, pasOne, pasTwo, age)) {
-        loshara.innerHTML = `<p style="color: red;">Need write all input</p>`;
-    }
-    else {
+async function checkingAndRegistration() {
+    try {
+        const fulname = document.getElementById('namePerson')?.value;
+        const surname = document.getElementById('surname')?.value;
+        const age = document.getElementById('age')?.value;
+        const gender = document.getElementById('gender')?.value;
+        const email = document.getElementById('email')?.value;
+        const pasOne = document.getElementById('passwordOne')?.value;
+        const pasTwo = document.getElementById('passwordTwo')?.value;
+        const loshara = document.getElementById('lox');
+        
+        if (!loshara) throw new Error('Error display element not found');
+        
+        if (isEmptySignUp(fulname, surname, gender, email, pasOne, pasTwo, age)) {
+            loshara.innerHTML = `<p style="color: red;">Please fill in all fields</p>`;
+            return;
+        }
+        
         if (checkPasswordsOnCoincidence(pasOne, pasTwo)) {
-            loshara.innerHTML = `<p style="color: red;">Passwords not right</p>`;
+            loshara.innerHTML = `<p style="color: red;">Passwords do not match</p>`;
+            return;
         }
-        else if (checkPasswordOnSpecial(pasOne)) {
-            loshara.innerHTML = `<p style="color: red;">Password need have spez simbols</p>`;
+        
+        if (checkPasswordOnSpecial(pasOne)) {
+            loshara.innerHTML = `<p style="color: red;">Password must contain at least 8 characters, including uppercase, number and special character</p>`;
+            return;
         }
-        else if (checkEmail(email)) {
-            loshara.innerHTML = `<p style="color: red;">Email not right</p>`;
+        
+        if (checkEmail(email)) {
+            loshara.innerHTML = `<p style="color: red;">Invalid email format</p>`;
+            return;
         }
-        else if (checkAge(age)) {
-            loshara.innerHTML = `<p style="color: red;">Age not right</p>`;
+        
+        if (checkAge(age)) {
+            loshara.innerHTML = `<p style="color: red;">Age must be between 14 and 120</p>`;
+            return;
         }
-        /*else if (checkUserYetInDataBase(email)) {
-            loshara.innerHTML = `<p style="color: red;">User yet in Data Base</p>`;
-        }*/
-        else {
-            saveInDataBase(fulname, surname, gender, email, pasOne, age); // Сохранение в БД
-            Vxod(); // Переход на страницу с задачами
+        
+        if (await checkUserYetInDataBase(email)) {
+            loshara.innerHTML = `<p style="color: red;">User already exists</p>`;
+            return;
+        }
+        
+        await saveInDataBase(fulname, surname, gender, email, pasOne, age);
+        await Vxod();
+    } catch (error) {
+        console.error('Registration error:', error);
+        const loshara = document.getElementById('lox');
+        if (loshara) {
+            loshara.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
         }
     }
 }
-
 </script>
