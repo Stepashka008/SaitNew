@@ -241,7 +241,7 @@ function checkPasswordsOnCoincidence(passwordOne, passwordTwo) { // Введен
     return passwordOne != passwordTwo;
 }
 async function checkCode(yourCode) { // Проверка на совпадение кода
-    const users = await getDataBaseUser();
+    const users = userDatabaseCache;
 
     for (const user of users) {
         if (user.email == email && user.code == yourCode) {
