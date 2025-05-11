@@ -95,18 +95,7 @@ button[type="button"]:active {
     border: 1px solid #c6f6d5;
 }
 
-/* Стили для разделения между этапами */
-#code, #passwordOne, #passwordTwo {
-    display: none; /* Скрыты до отправки кода */
-}
 
-/* Показываем вторую часть формы при необходимости */
-.show-second-step #code,
-.show-second-step #passwordOne,
-.show-second-step #passwordTwo,
-.show-second-step button[onclick="changePassword()"] {
-    display: block;
-}
 
 /* Адаптивность */
 @media (max-width: 480px) {
