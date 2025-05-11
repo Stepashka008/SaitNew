@@ -315,13 +315,13 @@ function changePassword() { // Смена пароля после получен
     passTwo = document.getElementById('passwordTwo').value;
 
     if (isEmptySignUp(code, passOne, passTwo)) {
-        losharaTwo.innerHTML = `<p style="color: red;">Need write all input</p>`;
+        loshara.innerHTML = `<p style="color: red;">Need write all input</p>`;
     }
     else if (checkPasswordsOnCoincidence(passOne, passTwo)) {
-        losharaTwo.innerHTML = `<p style="color: red;">Passwords not toghtether</p>`;
+        loshara.innerHTML = `<p style="color: red;">Passwords not toghtether</p>`;
     }
     else if (checkCode(code)) {
-        losharaTwo.innerHTML = `<p style="color: red;">Code not this</p>`;
+        loshara.innerHTML = `<p style="color: red;">Code not this</p>`;
     }
     else {
         changeUserPassword(code, hashing(passOne));
