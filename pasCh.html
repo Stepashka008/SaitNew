@@ -233,15 +233,58 @@ async function ToDo() { // Загрузка страницы с задачами
 }
 
 // ПРОВЕРКИ
-function checkEmailAndMessage(yourEmail) { // Проверяем и находим email
-    const users = userDatabaseCache;
-
-    for (const user of users) {
-        if (user.email == yourEmail) {
-            return user.code;
+async function checkEmailAndMessage(yourEmail) {
+    // Убедимся, что база данных загружена
+    if (!userDatabaseCache) {
+        try {
+            await getDataBaseUser();
+        } catch (error) {
+            console.error("Ошибка загрузки базы данных:", error);
+            return { found: false, code: 0 };
         }
     }
-    return 0;
+
+    // Нормализуем email для сравнения (регистронезависимо)
+    const emailToFind = yourEmail.trim().toLowerCase();
+    
+    for (const user of userDatabaseCache) {
+        if (user.email.trim().toLowerCase() === emailToFind) {
+            return { found: true, code: user.code };
+        }
+    }
+    return { found: false, code: 0 };
+}
+async function setCode() {
+    email = document.getElementById('email').value.trim();
+    
+    if (!email) {
+        loshara.innerHTML = `<p style="color: red;">Введите email</p>`;
+        return;
+    }
+
+    try {
+        const result = await checkEmailAndMessage(email);
+        
+        if (!result.found) {
+            loshara.innerHTML = `<p style="color: red;">Email не найден в базе данных</p>`;
+            return;
+        }
+
+        loshara.innerHTML = `<p style="color: black;">Введите код</p>`;
+        
+        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(result.code)}`);
+        
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        
+        const responseData = await response.json();
+        console.log("Ответ сервера:", responseData);
+        
+    } catch (error) {
+        console.error("Ошибка при отправке кода:", error);
+        loshara.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+    }
 }
 function isEmptySignUp(code, pasOne, pasTwo) { // Все поля заполнены
     return !code || !pasOne || !pasTwo;
@@ -249,15 +292,18 @@ function isEmptySignUp(code, pasOne, pasTwo) { // Все поля заполне
 function checkPasswordsOnCoincidence(passwordOne, passwordTwo) { // Введенные пароли совпадают
     return passwordOne != passwordTwo;
 }
-async function checkCode(yourCode) { // Проверка на совпадение кода
-    for (const user of userDatabaseCache) {
-        if (user.email == email && user.code == yourCode) {
-            return false;
-        }
+async function checkCode(yourCode) {
+    if (!userDatabaseCache) {
+        await getDataBaseUser();
     }
-    return true;
+    
+    return !userDatabaseCache.some(user => 
+        user.email.toLowerCase() === email.toLowerCase() && 
+        user.code == yourCode
+    );
 }
 
+// Отправка кода
 async function setCode() { // Отправляем код
     email = document.getElementById('email').value;
     const Code = checkEmailAndMessage(email); // ПРОБЛЕМА С НАХОЖДЕНИЕМ
@@ -309,23 +355,36 @@ async function changeUserPassword(code, newPassword) {
     }
 }
 
-function changePassword() { // Смена пароля после получения кода
-    code = document.getElementById('code').value;
-    passOne = document.getElementById('passwordOne').value;
-    passTwo = document.getElementById('passwordTwo').value;
+async function changePassword() {
+    const code = document.getElementById('code').value.trim();
+    const passOne = document.getElementById('passwordOne').value;
+    const passTwo = document.getElementById('passwordTwo').value;
 
-    if (isEmptySignUp(code, passOne, passTwo)) {
-        loshara.innerHTML = `<p style="color: red;">Need write all input</p>`;
+    if (!code || !passOne || !passTwo) {
+        losharaTwo.innerHTML = `<p style="color: red;">Заполните все поля</p>`;
+        return;
     }
-    else if (checkPasswordsOnCoincidence(passOne, passTwo)) {
-        loshara.innerHTML = `<p style="color: red;">Passwords not toghtether</p>`;
+
+    if (passOne !== passTwo) {
+        losharaTwo.innerHTML = `<p style="color: red;">Пароли не совпадают</p>`;
+        return;
     }
-    else if (checkCode(code)) {
-        loshara.innerHTML = `<p style="color: red;">Code not this</p>`;
-    }
-    else {
-        changeUserPassword(code, hashing(passOne));
-        Vxod();
+
+    try {
+        // Проверяем код асинхронно
+        const codeValid = await checkCode(code);
+        if (codeValid) {
+            losharaTwo.innerHTML = `<p style="color: red;">Неверный код</p>`;
+            return;
+        }
+
+        const success = await changeUserPassword(code, hashing(passOne));
+        if (success) {
+            await Vxod();
+        }
+    } catch (error) {
+        console.error("Ошибка при смене пароля:", error);
+        losharaTwo.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
     }
 }
 </script>
