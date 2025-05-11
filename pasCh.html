@@ -314,9 +314,9 @@ function changePassword() { // Смена пароля после получен
     else if (checkPasswordsOnCoincidence(passOne, passTwo)) {
         losharaTwo.innerHTML = `<p style="color: red;">Passwords not toghtether</p>`;
     }
-    else if (checkCode(code)) {
+    /*else if (checkCode(code)) {
         losharaTwo.innerHTML = `<p style="color: red;">Code not this</p>`;
-    }
+    }*/
     else {
         changeUserPassword(code, passOne);
         Vxod();
