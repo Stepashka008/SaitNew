@@ -114,7 +114,7 @@ button[type="button"]:active {
 }
 </style>
 
-<div id="Open">
+<div id="Open" onload="checkSESSION()">
         <p id="Sig">ReceptionPassword</p>
         <form id="SinglInForm">
             <div name="di" id="lox">
@@ -231,6 +231,18 @@ async function getDataBaseUser(forceRefresh = false) {
         console.error('Initialization error:', e);
     }
 })();
+
+// Проверка ссесии
+function checkSESSION() {
+    try {
+        const ses = JSON.parse(localStorage.getItem('mySESSION'));
+        if (ses?.check) {
+            ToDo();
+        }
+    } catch (error) {
+        console.error('Ошибка проверки сессии:', error);
+    }
+}
 
 // ХЭШИРОВАНИЕ ПАРОЛЯ
 function hashing(input) { // Хэширование
