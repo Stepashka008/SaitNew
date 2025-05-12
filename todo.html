@@ -5,35 +5,18 @@
                     <div class="loxTwo">  </div>
                 </div>
 
-                <a id="exit" href="http://localhost/TODOPHP/included/ToDo.inc.php?errors=logout">logout</a>
+                <a id="exit" href="#" onclick="Vxod()">logout</a>
     </div>
-    <form method="POST" action="../included/ToDo.inc.php" id="ToDoForm">
-
-            <?php if (isset($_GET['errors'])) { ?> <!-- Проверка на лоха -->
-                <p id="proverka"><?php echo $_GET['errors'] ?></p> <!-- Вывод, что нужно заполнить поля -->
-            <?php } ?>
-
+    <form id="ToDoForm">
+            <p id="proverka">  </p> <!-- Вывод, что нужно заполнить поля -->
             <div id="Comment">
                 <input name="nameCom" type="text" class="Inp" placeholder="Название">
                 <input name="Comment" type="text" class="Inp" placeholder="Комментарий">
             </div>
-            <button type="submit">Create</button>
+            <button type="button">Create</button>
     </form>
-
-    <?php if (!empty($_SESSION['form_html'])) { ?> <!-- Добавление -->
-        <p id="proverka"><?php echo $_SESSION['form_html']; unset($_SESSION['form_html']); ?></p>
-    <?php } ?>
-
-    <?php 
-        if (!$_SESSION['user']['visited']) {
-                    header("Location: ../included/ToDo.inc.php?errors=0"); // 0 - Загрузка коментариев
-                    $_SESSION['user']['visited'] = true;
-                    exit();
-            } 
-        $_SESSION['user']['visited'] = false; // Для обновления страницы
-    ?>
 <script>
-  // ОБЩАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ СТРАНИЦ
+ // ОБЩАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ СТРАНИЦ
 async function loadPage(url) {
     try {
         const response = await fetch(`http://localhost/proxy.php?error=${encodeURIComponent(url)}`);
@@ -80,9 +63,10 @@ async function ChangePassword() {
 }
 
 // ПРОВЕРКА СЕССИИ
-function checkToDoSession() {
+function checkToDoSession() { // Проверка сессии
     try {
         const ses = JSON.parse(localStorage.getItem('mySESSION'));
+        console.log(ses);
         if (!ses?.check) {
             Vxod();
             console.log('no');
@@ -95,5 +79,9 @@ function checkToDoSession() {
     } catch (error) {
         console.error('Ошибка проверки сессии:', error);
     }
+}
+
+function realizeComments() { // Загрузка комментариев
+
 }
 </script>
