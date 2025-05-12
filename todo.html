@@ -1,13 +1,6 @@
-<div id="main">
-            <?php 
-                session_start();
+<div id="main" onload="checkToDoSession()">
 
-                if (!$_SESSION['user']['logged_in']) {
-                    header('location: ../pages/SinglIn.php');
-                    exit();
-                }
-
-                ?> <!-- Проверка на лоха -->
+                <!-- Проверка на лоха -->
                 <div id="twoMain">
                     <p class="lox">ToDo</p>
                     <p class="loxTwo"><?php echo "Добро пожаловать, " . htmlspecialchars($_SESSION['user']['login']); ?></p>
