@@ -114,7 +114,7 @@ button[type="button"]:active {
 }
 </style>
 
-<div id="Open">
+<div id="Open" onload="checkSESSION()">
         <p id="Sig">SinglUp</p>
         <form id="SinglInForm">
             <div name="di" id="lox">
@@ -161,6 +161,18 @@ async function getDataBaseUser() {
     } catch (error) {
         console.error('Failed to fetch users:', error);
         throw error; // Позволяет обработать ошибку на уровне вызова
+    }
+}
+
+// Проверка ссесии
+function checkSESSION() {
+    try {
+        const ses = JSON.parse(localStorage.getItem('mySESSION'));
+        if (ses?.check) {
+            ToDo();
+        }
+    } catch (error) {
+        console.error('Ошибка проверки сессии:', error);
     }
 }
 
