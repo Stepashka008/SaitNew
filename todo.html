@@ -1,9 +1,8 @@
 <div id="main" onload="checkToDoSession()">
-
                 <!-- Проверка на лоха -->
                 <div id="twoMain">
                     <p class="lox">ToDo</p>
-                    <p class="loxTwo"><?php echo "Добро пожаловать, " . htmlspecialchars($_SESSION['user']['login']); ?></p>
+                    <div class="loxTwo">  </div>
                 </div>
 
                 <a id="exit" href="http://localhost/TODOPHP/included/ToDo.inc.php?errors=logout">logout</a>
@@ -33,3 +32,66 @@
             } 
         $_SESSION['user']['visited'] = false; // Для обновления страницы
     ?>
+<script>
+  // ОБЩАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ СТРАНИЦ
+async function loadPage(url) {
+    try {
+        const response = await fetch(`http://localhost/proxy.php?error=${encodeURIComponent(url)}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        const htmlContent = atob(data.content);
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        
+        // Сначала очищаем body
+        document.body.innerHTML = '';
+        
+        // Переносим все элементы кроме скриптов
+        const nodes = Array.from(tempDiv.childNodes).filter(node => node.nodeName !== 'SCRIPT');
+        document.body.append(...nodes);
+        
+        // Затем добавляем скрипты
+        const scripts = tempDiv.querySelectorAll('script');
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            if (script.src) {
+                newScript.src = script.src;
+            } else {
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        document.body.innerHTML = `<p style="color: red;">Ошибка загрузки страницы: ${error.message}</p>`;
+    }
+}
+// ПЕРЕХОД НА ДРУГИЕ СТРАНИЦЫ
+async function Vxod() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/sigIn.html');
+}
+async function Registration() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/sigUp.html');
+}
+async function ChangePassword() {
+    await loadPage('https://api.github.com/repos/Stepashka008/SaitNew/contents/pasCh.html');
+}
+
+// ПРОВЕРКА СЕССИИ
+function checkToDoSession() {
+    try {
+        const ses = JSON.parse(localStorage.getItem('mySESSION'));
+        if (!ses?.check) {
+            Vxod();
+        }
+        else {
+            let loxTwo = document.getElementById('loxTwo');
+            loxTwo.innerHTML = `<p> Добро пожаловать, ${ses.login} </p>`
+        }
+    } catch (error) {
+        console.error('Ошибка проверки сессии:', error);
+    }
+}
+</script>
