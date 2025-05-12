@@ -366,6 +366,7 @@ async function saveInDataBase(fulname, surnames, gen, em, pasOnes, ag) {
 }
 
 async function emailActiv(emails) {
+    const loshara = document.getElementById('lox');
     try {
         loshara.innerHTML = `<p style="color: green;">Отправлен на email</p>`;
         
