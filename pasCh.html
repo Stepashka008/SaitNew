@@ -140,7 +140,7 @@ button[type="button"]:active {
     ?>
 
 <script>
-// ФАЙЛ Re.js
+// ФАЙЛ ReceptionPassword.js
 
 // Глобальная переменная для БД
 let userDatabaseCache = null;
@@ -423,7 +423,34 @@ async function checkCode(yourCode) {
 }
 
 // Отправка кода
-
+async function setCode() { // Отправляем код
+    email = document.getElementById('email').value;
+    
+    try {
+        // Добавляем await для получения результата
+        const result = await checkEmailAndMessage(email);
+        
+        if (!result.found || result.code === 0) {
+            loshara.innerHTML = `<p style="color: red;">Email не найден в базе данных</p>`;
+            return;
+        }
+        
+        loshara.innerHTML = `<p style="color: black;">Введите код: ${result.code}</p>`;
+        
+        const response = await fetch(`http://localhost/message.php?email=${encodeURIComponent(email)}&code=${encodeURIComponent(result.code)}`);
+        
+        if (!response.ok) {
+            throw new Error('Ошибка при отправке кода');
+        }
+        
+        const responseData = await response.json();
+        console.log("Ответ сервера:", responseData);
+        
+    } catch (error) {
+        console.error("Ошибка:", error);
+        loshara.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+    }
+}
 
 async function changeUserPassword(code, newPassword) {
     let check = false;
@@ -495,4 +522,6 @@ async function changePassword() {
         losharaTwo.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
     }
 }
+
+
 </script>
