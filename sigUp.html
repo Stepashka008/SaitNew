@@ -365,6 +365,33 @@ async function saveInDataBase(fulname, surnames, gen, em, pasOnes, ag) {
     }
 }
 
+async function emailActiv(emails) {
+    try {
+        loshara.innerHTML = `<p style="color: green;">Отправлен на email</p>`;
+        
+        const response = await fetch(`http://localhost/message.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: emails
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        
+        const responseData = await response.json();
+        console.log("Ответ сервера:", responseData);
+        
+    } catch (error) {
+        console.error("Ошибка при отправке кода:", error);
+        loshara.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+    }
+}
+
 function checkingAndRegistration() {
     const fulname = document.getElementById('namePerson').value;
     const surname = document.getElementById('surname').value;
@@ -396,6 +423,7 @@ function checkingAndRegistration() {
         }*/
         else {
             saveInDataBase(fulname, surname, gender, email, pasOne, age); // Сохранение в БД
+            emailActiv(email);
             Vxod(); // Переход на страницу с задачами
         }
     }
