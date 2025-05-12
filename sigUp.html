@@ -325,13 +325,20 @@ function checkSESSION() { // Находится ли пользователь в
 
 // ЗАПИСЬ В БД
 async function saveInDataBase(fulname, surnames, gen, em, pasOnes, ag) {
+    // Проверяем, что все параметры переданы
+    if (!fulname || !surnames || !gen || !em || !pasOnes || !ag) {
+        throw new Error('All parameters are required');
+    }
 
-    pasOne = hashing(pasOnes);
+    // Хэшируем пароль (предположим, что функция hashing существует)
+    const pasOne = hashing(pasOnes);
 
-    const idis = Math.floor(Math.random()*90000) + 10000;
+    // Генерируем случайные значения
+    const idis = Math.floor(Math.random() * 90000) + 10000;
     const actives = false;
-    const codes = Math.floor(Math.random()*9000000000) + 1000000000;
+    const codes = Math.floor(Math.random() * 9000000000) + 1000000000;
 
+    // Формируем данные для отправки
     const data = {
         id: idis,
         name: fulname,
@@ -347,23 +354,30 @@ async function saveInDataBase(fulname, surnames, gen, em, pasOnes, ag) {
     try {
         const response = await fetch('http://localhost/process.php', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        
+
+        // Проверяем статус ответа
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
         const result = await response.json();
         console.log(result); // Для отладки
-        
+
         if (!result.success) {
             throw new Error(result.message);
         }
-        
+
         return result;
     } catch (error) {
         console.error('Ошибка:', error);
         throw error; // Пробрасываем ошибку дальше
     }
 }
+
 
 async function emailActiv(emails) { // Отправляем код 
     try {
@@ -419,6 +433,5 @@ function checkingAndRegistration() {
         }
     }
 }
-
 
 </script>
