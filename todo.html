@@ -85,10 +85,12 @@ function checkToDoSession() {
         const ses = JSON.parse(localStorage.getItem('mySESSION'));
         if (!ses?.check) {
             Vxod();
+            console.log('no');
         }
         else {
             let loxTwo = document.getElementById('loxTwo');
             loxTwo.innerHTML = `<p> Добро пожаловать, ${ses.login} </p>`
+            console.log('yes');
         }
     } catch (error) {
         console.error('Ошибка проверки сессии:', error);
